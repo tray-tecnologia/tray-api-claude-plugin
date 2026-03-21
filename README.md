@@ -14,8 +14,9 @@ Plugin completo para integração com as APIs da Tray. Acelera o desenvolvimento
 ## Instalação
 
 ```bash
-# Via GitHub
-/plugin install tray-tecnologia/tray-api-claude-plugin
+# Via marketplace próprio
+/plugin marketplace add tray-tecnologia/tray-api-claude-plugin
+/plugin install tray-api@tray-plugins
 
 # Desenvolvimento local (clone o repositório)
 git clone https://github.com/tray-tecnologia/tray-api-claude-plugin.git

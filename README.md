@@ -1,15 +1,25 @@
-# Plugin Tray para Claude Code
+# Plugin Tray API para Claude Code
 
-Plugin completo para integração com as APIs da Tray. Acelera o desenvolvimento de aplicativos e-commerce por parceiros e comunidade na plataforma Tray.
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet)](https://code.claude.com/docs/pt/plugins)
+[![API Tray](https://img.shields.io/badge/API-Tray%20E--commerce-orange)](https://developers.tray.com.br)
+
+Plugin completo para integração com as APIs da Tray. Acelera o desenvolvimento de aplicativos e-commerce por parceiros e comunidade na plataforma Tray, fornecendo documentação detalhada de **150+ endpoints**, fluxos de autenticação OAuth, webhooks e boas práticas de integração.
+
+## Pré-requisitos
+
+- [Claude Code](https://claude.com/claude-code) instalado
+- Credenciais de API Tray (Consumer Key e Consumer Secret) — obtidas em https://developers.tray.com.br
 
 ## Instalação
 
 ```bash
-# Via marketplace (quando disponível)
-/plugin install tray-api
+# Via GitHub
+/plugin install tray-tecnologia/tray-api-claude-plugin
 
-# Desenvolvimento local
-claude --plugin-dir ./tray-api
+# Desenvolvimento local (clone o repositório)
+git clone https://github.com/tray-tecnologia/tray-api-claude-plugin.git
+claude --plugin-dir ./tray-api-claude-plugin
 ```
 
 ## Componentes
@@ -23,28 +33,49 @@ claude --plugin-dir ./tray-api
 
 ## Skills Disponíveis
 
-### Núcleo 
+### Núcleo
 `autorizacao`, `webhooks`, `produtos`, `variacoes`, `imagens-produtos`, `categorias`, `pedidos`, `clientes`, `informacoes-loja`
 
-### Complementar 
+### Complementar
 `caracteristicas`, `marcas`, `kits`, `status-pedido`, `enderecos-cliente`, `perfis-cliente`, `frete`, `configuracao-frete`, `multicd`, `notas-fiscais`, `pagamentos`
 
-### Avançado 
+### Avançado
 `cupons`, `carrinho-compras`, `listagem-carrinho`, `informacoes-adicionais`, `listas-preco-b2b`, `emissores-etiqueta`, `etiquetas-mercado-livre`, `etiquetas-hub`, `scripts-externos`, `newsletter`, `parceiros`, `palavras-chave`, `produtos-vendidos`, `usuarios`
 
 ## Agentes
 
-- `/tray-api:configuracao-aplicativo` — Guia de setup inicial
-- `/tray-api:gestor-catalogo` — Gestão em massa de catálogo
-- `/tray-api:gestor-pedidos` — Ciclo completo de pedidos
-- `/tray-api:debug-integracao` — Diagnóstico de problemas
-- `/tray-api:assistente-migracao` — Migração de outras plataformas (Shopify, WooCommerce, Magento, VTEX, Nuvemshop)
+| Agente | Descrição |
+|:--|:--|
+| `/tray-api:configuracao-aplicativo` | Guia de setup inicial e configuração OAuth |
+| `/tray-api:gestor-catalogo` | Gestão em massa de catálogo (produtos, categorias, variações) |
+| `/tray-api:gestor-pedidos` | Ciclo completo de pedidos (criação, status, fulfillment) |
+| `/tray-api:debug-integracao` | Diagnóstico de problemas e erros de API |
+| `/tray-api:assistente-migracao` | Migração de outras plataformas (Shopify, WooCommerce, Magento, VTEX, Nuvemshop) |
 
 ## Comandos
 
-- `/tray-api:setup` — Configuração rápida de integração
-- `/tray-api:referencia-api` — Referência de endpoints
-- `/tray-api:validar-integracao` — Checklist de validação
+| Comando | Descrição |
+|:--|:--|
+| `/tray-api:setup` | Configuração rápida de integração |
+| `/tray-api:referencia-api` | Referência completa de endpoints |
+| `/tray-api:validar-integracao` | Checklist de validação pré-publicação |
+
+## Exemplo de Uso
+
+```
+> /tray-api:setup
+# Configura credenciais e testa conexão com a API Tray
+
+> Como listar todos os produtos da minha loja?
+# O plugin fornece automaticamente a documentação do endpoint GET /products
+
+> /tray-api:validar-integracao
+# Valida se sua integração está pronta para homologação
+```
+
+## Contribuindo
+
+Contribuições são bem-vindas! Abra uma issue ou envie um pull request em [GitHub](https://github.com/tray-tecnologia/tray-api-claude-plugin).
 
 ## Referências
 

@@ -5,14 +5,14 @@
     "email": "rmoraes@tray.net.br"
   },
   "metadata": {
-    "description": "Official Tray E-commerce plugins for Claude Code",
+    "description": "Plugins oficiais da Tray E-commerce para Claude Code",
     "version": "1.0.0"
   },
   "plugins": [
     {
       "name": "tray-api",
       "source": ".",
-      "description": "Complete plugin for Tray E-commerce API integration. 34 skills, 5 agents, 3 commands covering 150+ endpoints.",
+      "description": "Plugin completo para integração com as APIs da Tray E-commerce. 34 skills, 5 agentes, 3 comandos cobrindo 150+ endpoints.",
       "version": "1.0.0",
       "author": {
         "name": "Rodolfo Moraes",

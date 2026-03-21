@@ -9,8 +9,8 @@ Plugin completo para integração com as APIs da Tray. Acelera o desenvolvimento
 ## Pré-requisitos
 
 - [Claude Code](https://claude.com/claude-code) instalado
-- Credenciais de API Tray (Consumer Key e Consumer Secret) — obtidas em https://developers.tray.com.br
-
+- Credenciais de API Tray (Consumer Key e Consumer Secret) — obtidas em [developers.tray.com.br
+](https://developers.tray.com.br/#criando-seu-aplicativo)
 ## Instalação
 
 ```bash

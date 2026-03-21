@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Verifique se o código que acabou de ser escrito contém access_tokens, consumer_keys ou consumer_secrets da Tray hardcoded. Se encontrar, alerte o desenvolvedor para usar variáveis de ambiente. Verifique também se as URLs de endpoint seguem o padrão https://{api_address}/endpoint?access_token={token}. Responda apenas se encontrar algum problema."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "tray|Tray|TRAY|api_address|access_token.*tray",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "O usuário está perguntando sobre a Tray. Lembre-se: a API usa OAuth 2.0 com access_token como query parameter, o access_token expira em 3 horas, o refresh_token em 30 dias, há limite de 180 req/min e 10.000 req/dia, e a URL base segue o padrão https://{api_address}/. A documentação oficial está em https://developers.tray.com.br. Adicione contexto apenas se relevante à pergunta."
+          }
+        ]
+      }
+    ]
+  }
+}

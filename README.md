@@ -63,7 +63,76 @@ claude --plugin-dir ./tray-api-claude-plugin
 
 ## Exemplo de Uso
 
+```bash
+# 1. Adicione o marketplace
+❯ /plugin marketplace add tray-tecnologia/tray-api-claude-plugin
+  ⎿  Successfully added marketplace: tray-plugins
+
+# 2. Instale o plugin
+❯ /plugin install tray-api@tray-plugins
+  ⎿  ✓ Installed tray-api. Run /reload-plugins to activate.
+
+# 3. Ative o plugin
+❯ /reload-plugins
+  ⎿  Reloaded: 1 plugins · 34 skills · 5 agents · 2 hooks · 1 plugin MCP server · 0 plugin LSP servers
 ```
+
+```bash
+# Veja todas as skills disponíveis
+❯ Quais skills disponíveis?
+
+⏺ Aqui estão as skills disponíveis:
+
+  Tray API - Setup & Auth:
+  - /tray-api:setup — Guia rápido de configuração inicial
+  - /tray-api:autorizacao — Fluxo OAuth 2.0, tokens, refresh
+  - /tray-api:validar-integracao — Valida código de integração
+  - /tray-api:referencia-api — Referência rápida de endpoints
+  - /tray-api:webhooks — Notificações em tempo real
+
+  Tray API - Catálogo:
+  - /tray-api:produtos — CRUD de produtos
+  - /tray-api:variacoes — Variações/SKUs
+  - /tray-api:categorias — Árvore de categorias
+  - /tray-api:marcas — Marcas/fabricantes
+  - /tray-api:imagens-produtos — Upload de imagens
+  - /tray-api:caracteristicas — Propriedades de produtos
+  - /tray-api:informacoes-adicionais — Campos customizados
+  - /tray-api:kits — Kits/combos de produtos
+
+  Tray API - Pedidos & Frete:
+  - /tray-api:pedidos — Ciclo completo de pedidos
+  - /tray-api:status-pedido — Status personalizados
+  - /tray-api:notas-fiscais — NF-e
+  - /tray-api:frete — Cálculo de frete
+  - /tray-api:configuracao-frete — Métodos de envio
+  - /tray-api:carrinho-compras — Carrinho de compras
+  - /tray-api:listagem-carrinho — Listagem de carrinhos
+  - /tray-api:etiquetas-hub — Etiquetas HUB
+  - /tray-api:etiquetas-mercado-livre — Etiquetas ML
+  - /tray-api:emissores-etiqueta — Emissores de etiqueta
+
+  Tray API - Clientes & Pagamentos:
+  - /tray-api:clientes — CRUD de clientes
+  - /tray-api:enderecos-cliente — Endereços
+  - /tray-api:perfis-cliente — Perfis/segmentos
+  - /tray-api:pagamentos — Meios de pagamento
+  - /tray-api:cupons — Cupons de desconto
+  - /tray-api:listas-preco-b2b — Preços B2B
+
+  Tray API - Loja & Outros:
+  - /tray-api:informacoes-loja — Dados da loja
+  - /tray-api:scripts-externos — Scripts JS na vitrine
+  - /tray-api:multicd — Centros de distribuição
+  - /tray-api:parceiros — Parceiros/revendedores
+  - /tray-api:usuarios — Usuários administrativos
+  - /tray-api:produtos-vendidos — Analytics de vendas
+  - /tray-api:palavras-chave — SEO
+  - /tray-api:newsletter — Assinaturas de newsletter
+```
+
+```bash
+# Exemplos de uso
 > /tray-api:setup
 # Configura credenciais e testa conexão com a API Tray
 

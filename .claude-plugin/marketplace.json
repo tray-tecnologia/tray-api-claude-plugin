@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "tray-api",
-      "source": ".",
+      "source": "./",
       "description": "Plugin completo para integração com as APIs da Tray E-commerce. 34 skills, 5 agentes, 3 comandos cobrindo 150+ endpoints.",
       "version": "1.0.0",
       "author": {

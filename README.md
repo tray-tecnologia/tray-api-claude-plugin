@@ -34,7 +34,7 @@ claude --plugin-dir ./tray-api-claude-plugin
 
 ## Skills Disponíveis
 
-### Núcleo
+### Base
 `autorizacao`, `webhooks`, `produtos`, `variacoes`, `imagens-produtos`, `categorias`, `pedidos`, `clientes`, `informacoes-loja`
 
 ### Complementar

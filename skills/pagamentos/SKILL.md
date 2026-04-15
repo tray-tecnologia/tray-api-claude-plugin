@@ -225,3 +225,32 @@ Documentação oficial: https://developers.tray.com.br/#apis-de-informacoes-de-p
 7. **Conciliação** — use `transaction_id` para conciliar pagamentos entre a Tray e o gateway
 8. **Múltiplos pagamentos** — um pedido pode ter múltiplos pagamentos (ex: parte no cartão, parte no boleto)
 9. **Recursos relacionados** — consulte os skills `tray-pedidos` e `tray-webhooks` para operações complementares
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "lista os métodos de pagamento disponíveis na loja"
+- "consulta todos os pagamentos aprovados do dia de hoje"
+- "registra o pagamento via PIX para o pedido 1001"
+- "implementa a conciliação de pagamentos entre a Tray e meu gateway"
+
+### O que o Claude faz
+
+1. Gera o código de consulta de opções de pagamento via `GET /payments/options`
+2. Gera o código de registro de pagamento com wrapper `Payment` e campos específicos por tipo
+3. Filtra pagamentos por status, tipo e data conforme necessário
+4. Implementa conciliação usando `transaction_id` do gateway
+
+### O que você recebe
+
+- Código de listagem de opções e configurações de pagamento da loja
+- Código de criação de pagamento com campos específicos por tipo (PIX, boleto, cartão)
+- Filtros de consulta por status e data
+- Lógica de conciliação com `transaction_id`
+
+### Pré-requisitos
+
+- `access_token` configurado
+- `order_id` do pedido para registro de pagamento
+- Gateway de pagamento configurado na loja Tray

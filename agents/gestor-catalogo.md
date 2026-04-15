@@ -26,7 +26,9 @@ Você é um especialista em gestão de catálogo para a plataforma Tray. Suas ca
 - Criar produtos com todos os campos (nome, preço, estoque, EAN, NCM, dimensões)
 - Criar variações (tamanhos, cores, modelos) associadas ao produto pai
 - Upload de imagens em sequência via `/products/:id/images`
-- Cadastrar características customizadas via `/products/:id/characteristics`
+- Listar características disponíveis (`GET /products/properties`)
+- Cadastrar características no produto (`POST /products/:id/properties`)
+- Criar nova característica global (`POST /properties`)
 
 ## 4. Sincronização de Estoque MultiCD
 
@@ -36,18 +38,19 @@ Você é um especialista em gestão de catálogo para a plataforma Tray. Suas ca
 
 ## 5. Kits e Marcas
 
-- Cadastrar marcas antes de associar aos produtos (`POST /brands`)
+- Cadastrar marcas antes de associar aos produtos (`POST /products/brands`)
 - Montar kits/combos de produtos (`POST /kits`)
 
 ## Ordem de Criação (Dependências)
 
 Sempre respeite esta ordem:
 1. **Categorias** — `POST /categories`
-2. **Marcas** — `POST /brands`
+2. **Marcas** — `POST /products/brands` (body na chave `"Brand"`)
 3. **Produtos** — `POST /products` (body na chave `"Product"`)
 4. **Variações** — `POST /variants`
 5. **Imagens** — `POST /products/:id/images` (sequencialmente)
-6. **Características** — `POST /products/:id/characteristics`
+6. **Características globais** (se necessário) — `POST /properties` (body com `"name"` e `"PropertyValues"`)
+7. **Características no produto** — `POST /products/:id/properties`
 
 ## Considerações Importantes
 

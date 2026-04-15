@@ -179,3 +179,32 @@ A chave de acesso (`key`) possui 44 dígitos e contém informações codificadas
 6. **CFOP correto** — use o CFOP adequado para a operação (venda interna vs. interestadual)
 7. **Série consistente** — mantenha a série da NF consistente com o emissor fiscal configurado
 8. **Recursos relacionados** — consulte o skill `tray-pedidos` para gerenciar pedidos associados
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "registra a NF-e do pedido 1001 com chave de acesso e link do DANFE"
+- "lista todas as notas fiscais emitidas no mês de março"
+- "consulta as notas fiscais do pedido ID 2050"
+- "implementa a integração de envio automático de NF-e após emissão no ERP"
+
+### O que o Claude faz
+
+1. Gera o código de registro da NF-e com wrapper `Invoice` e todos os campos obrigatórios
+2. Valida o formato da chave de acesso (44 dígitos) antes de montar a chamada
+3. Usa o endpoint correto `POST /orders/:order_id/invoices` com o `order_id` na URL
+4. Inclui filtros de data e `order_id` para listagens
+
+### O que você recebe
+
+- Código de registro de NF-e com todos os campos (número, série, chave, CFOP, DANFE)
+- Validação da chave de acesso de 44 dígitos
+- Código de consulta por pedido via `GET /orders/:order_id/invoices`
+- Exemplo de integração com fluxo de ERP
+
+### Pré-requisitos
+
+- `access_token` configurado
+- `order_id` do pedido já existente na Tray
+- Dados da NF-e emitida pelo sistema fiscal (número, série, chave de acesso)

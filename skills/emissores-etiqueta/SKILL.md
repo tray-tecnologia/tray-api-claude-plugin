@@ -51,3 +51,29 @@ Content-Type: application/json
   }
 }
 ```
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "integra meu sistema de etiquetas externo com a Tray"
+- "cadastra a URL do meu emissor de etiquetas e vincula ao pedido 12345"
+- "implementa o fluxo completo de geração e vinculação de etiquetas ao pedido"
+
+### O que o Claude faz
+
+1. Gera o código de cadastro da URL base do emissor com `POST /label-emitters`
+2. Gera o código de vinculação da etiqueta ao pedido com `POST /label-emitters/:order_id`
+3. Guia o fluxo de 3 etapas: cadastrar URL → vincular ao pedido → excluir se necessário
+
+### O que você recebe
+
+- Código de cadastro da URL do emissor com wrapper `LabelEmitter`
+- Código de vinculação de etiqueta PDF gerada ao pedido
+- Código de exclusão via `DELETE /label-emitters/:id`
+
+### Pré-requisitos
+
+- `access_token` configurado
+- URL do sistema externo de geração de etiquetas
+- `order_id` do pedido para vinculação

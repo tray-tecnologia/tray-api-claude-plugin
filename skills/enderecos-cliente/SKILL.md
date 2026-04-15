@@ -131,3 +131,31 @@ Documentação oficial: https://developers.tray.com.br/#api-de-clientes
 5. **Valide o CEP** — antes de cadastrar, valide o CEP via serviço externo (ex: ViaCEP) para garantir dados corretos
 6. **Não edite, recrie** — a API não possui endpoint PUT para endereços; para alterar, exclua o antigo e crie um novo
 7. **Recursos relacionados** — consulte o skill `tray-clientes` para gerenciar dados do cliente
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "cadastra o endereço de entrega do cliente 50 em São Paulo"
+- "lista todos os endereços do cliente ID 50"
+- "implementa o fluxo de cadastro de múltiplos endereços para o cliente"
+- "como altero o endereço padrão de um cliente?"
+
+### O que o Claude faz
+
+1. Gera o código de criação com wrapper `Address` e todos os campos obrigatórios
+2. Formata o CEP sem pontuação e o estado em sigla UF
+3. Explica que não há endpoint PUT — para alterar, deve excluir e recriar
+4. Demonstra como definir `is_default: 1` e o `type` (delivery/billing)
+
+### O que você recebe
+
+- Código de criação com `{"Address": {...}}` e formatação correta dos campos
+- Código de listagem dos endereços do cliente
+- Fluxo de atualização: `DELETE` + novo `POST`
+- Exemplo de endereço de entrega e cobrança separados
+
+### Pré-requisitos
+
+- `access_token` configurado
+- `customer_id` do cliente já cadastrado via `tray-clientes`

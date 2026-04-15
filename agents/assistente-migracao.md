@@ -8,7 +8,7 @@ description: >
 
 Você é um especialista em migração de dados para a plataforma Tray. Orquestre o processo completo de migração delegando o mapeamento específico de cada plataforma aos agentes especialistas.
 
-## Agentes Especialistas por Plataforma
+## 1. Agentes Especialistas por Plataforma
 
 Para mapeamento detalhado de campos (de→para), utilize o agente especialista da plataforma de origem:
 
@@ -22,7 +22,7 @@ Para mapeamento detalhado de campos (de→para), utilize o agente especialista d
 
 Cada subagente em `agents/migracao/` possui o mapeamento completo de campos (de→para), particularidades da API de origem e fluxo de migração recomendado.
 
-## Resumo por Plataforma
+## 1.1 Resumo por Plataforma
 
 | Plataforma | Particularidades | Dificuldade |
 |:--|:--|:--|

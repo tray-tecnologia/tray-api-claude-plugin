@@ -1,117 +1,184 @@
 ---
 name: tray-cupons
 description: >
-  API completa de cupons de desconto da Tray.
+  API completa de cupons de desconto da Tray (discount_coupons).
   Permite criar, editar, excluir e consultar cupons, além de
   gerenciar relacionamentos com clientes, produtos, categorias,
-  marcas, fretes e cupons-presente. Contém 21 endpoints.
+  marcas e fretes. Contém 21 endpoints.
 ---
 
-# Cupons de Desconto
+# Cupons de Desconto — API Tray
 
-API para gerenciamento completo de cupons de desconto na plataforma Tray.
+Documentação oficial: https://developers.tray.com.br/#api-de-cupom
 
-Referência oficial: [https://developers.tray.com.br/#api-de-cupom](https://developers.tray.com.br/#api-de-cupom)
+> **Atenção:** O endpoint base é `/discount_coupons` (não `/coupons`). O wrapper de resposta é `DiscountCoupon` (não `Coupon`).
 
-## Autenticacao
+## Autenticação
 
-Todas as requisicoes utilizam query string para autenticacao:
+Todas as requisições utilizam query string: `?access_token={token}`
+
+## Paginação
+
+Endpoints de listagem suportam: `?limit=30&page=1` (máximo 50 por página)
+
+## Endpoints — CRUD
+
+| Método | Endpoint | Descrição |
+|:--|:--|:--|
+| GET | `/discount_coupons` | Listar cupons |
+| GET | `/discount_coupons/:id` | Detalhes de um cupom |
+| POST | `/discount_coupons` | Criar cupom |
+| PUT | `/discount_coupons/:id` | Atualizar cupom |
+| DELETE | `/discount_coupons/:id` | Excluir cupom |
+
+## Endpoints — Consulta de Relacionamentos (GET)
+
+| Endpoint | Descrição |
+|:--|:--|
+| `/discount_coupons/customer_relationship/:id` | Listar clientes vinculados |
+| `/discount_coupons/product_relationship/:id` | Listar produtos vinculados |
+| `/discount_coupons/category_relationship/:id` | Listar categorias vinculadas |
+| `/discount_coupons/brand_relationship/:id` | Listar marcas vinculadas |
+| `/discount_coupons/shipping_relationship/:id` | Listar fretes vinculados |
+| `/discount_coupons/gift_relationship/:id` | Consultar cupom-presente vinculado |
+
+> **Dica:** Ao listar cupons (`GET /discount_coupons`), o campo `coupon_type` indica qual relacionamento buscar: `cliente` → customer_relationship, `loja` com `local_application=produtos` → product_relationship, etc.
+
+## Endpoint — Criação de Relacionamentos (POST)
+
+Todos os tipos de relacionamento usam o **mesmo endpoint**:
 
 ```
-?access_token={token}
+POST /discount_coupons/create_relationship/:id
 ```
 
-## Paginacao
+O tipo de relacionamento é definido pelo corpo da requisição (máximo 100 registros por POST):
 
-Endpoints de listagem suportam paginacao via query string:
+**Vincular clientes:**
+```json
+{
+  "DiscountCouponCustomer": [
+    { "customer_id": "10" },
+    { "customer_id": "20" }
+  ]
+}
+```
 
-- `limit` — maximo 50, padrao 30
-- `page` — numero da pagina
+**Vincular produtos:**
+```json
+{
+  "DiscountCouponProduct": [
+    { "product_id": "10" },
+    { "product_id": "20" }
+  ]
+}
+```
 
-## Endpoints
+**Vincular categorias:**
+```json
+{
+  "DiscountCouponCategory": [
+    { "category_id": "10" }
+  ]
+}
+```
 
-### CRUD de Cupons
+**Vincular marcas:**
+```json
+{
+  "DiscountCouponBrand": [
+    { "brand_id": "10" }
+  ]
+}
+```
 
-| Metodo | Endpoint | Descricao |
-|--------|----------|-----------|
-| GET | `/coupons?access_token={token}` | Listar cupons |
-| GET | `/coupons/{id}?access_token={token}` | Detalhes de um cupom |
-| POST | `/coupons?access_token={token}` | Criar cupom |
-| PUT | `/coupons/{id}?access_token={token}` | Atualizar cupom |
-| DELETE | `/coupons?access_token={token}` | Excluir cupom (generico) |
-| DELETE | `/coupons/{id}/products?access_token={token}` | Excluir cupom com produtos especificos |
+**Vincular fretes (método de envio):**
+```json
+{
+  "DiscountCouponShipping": [
+    { "shipping_id": "10" }
+  ]
+}
+```
 
-### Consultas de Relacionamento
+**Vincular frete grátis (valor zerado):**
+```json
+{
+  "DiscountCouponShipping": {
+    "value": "0"
+  }
+}
+```
 
-| Metodo | Endpoint | Descricao |
-|--------|----------|-----------|
-| GET | `/coupons/{id}/customers?access_token={token}` | Listar clientes do cupom |
-| GET | `/coupons/{id}/products?access_token={token}` | Listar produtos do cupom |
-| GET | `/coupons/{id}/categories?access_token={token}` | Listar categorias do cupom |
-| GET | `/coupons/{id}/brands?access_token={token}` | Listar marcas do cupom |
-| GET | `/coupons/{id}/shipping?access_token={token}` | Listar fretes do cupom |
-| GET | `/coupons/{id}/gift_coupon?access_token={token}` | Consultar cupom-presente |
+**Vincular desconto de frete (valor específico):**
+```json
+{
+  "DiscountCouponShipping": {
+    "value": "10"
+  }
+}
+```
 
-### Criacao de Relacionamentos
+**Criar cupom de troca a partir de pedido:**
+```json
+{
+  "DiscountCouponCustomer": {
+    "order_id": "10"
+  }
+}
+```
 
-| Metodo | Endpoint | Descricao |
-|--------|----------|-----------|
-| POST | `/coupons/{id}/customers?access_token={token}` | Vincular cliente ao cupom |
-| POST | `/coupons/{id}/products?access_token={token}` | Vincular produtos ao cupom |
-| POST | `/coupons/{id}/categories?access_token={token}` | Vincular categorias ao cupom |
-| POST | `/coupons/{id}/brands?access_token={token}` | Vincular marcas ao cupom |
-| POST | `/coupons/{id}/free_shipping?access_token={token}` | Vincular frete gratis ao cupom |
-| POST | `/coupons/{id}/shipping_discount?access_token={token}` | Vincular desconto de frete ao cupom |
-| POST | `/coupons/{id}/exchange_coupon?access_token={token}` | Criar cupom de troca |
-| POST | `/coupons/{id}/gift_coupon?access_token={token}` | Criar cupom-presente |
-| DELETE | `/coupons/{id}/gift_coupon?access_token={token}` | Excluir cupom-presente |
+## Campos — Criar/Atualizar Cupom
 
-## Campos Principais
+O body usa `Content-Type: application/x-www-form-urlencoded` com o wrapper `["DiscountCoupon"]["campo"]`. A estrutura JSON equivalente:
 
-| Campo | Tipo | Descricao |
-|-------|------|-----------|
-| `code` | string | Codigo do cupom (unico) |
-| `discount_type` | string | Tipo de desconto: `percent` (porcentagem) ou `fixed` (valor fixo) |
-| `discount_value` | decimal | Valor do desconto |
-| `start_date` | date | Data de inicio de validade |
-| `end_date` | date | Data de fim de validade |
-| `usage_limit` | integer | Limite de utilizacoes do cupom |
-| `minimum_purchase` | decimal | Valor minimo de compra para aplicar o cupom |
-| `active` | boolean | Indica se o cupom esta ativo |
-| `cumulative` | boolean | Indica se o cupom e cumulativo com outros descontos |
+| Campo | Tipo | Obrigatório | Descrição |
+|:--|:--|:--|:--|
+| `code` | string | Sim | Código do cupom — sem espaços nem acentos |
+| `description` | string | Não | Descrição do cupom |
+| `coupon_type` | string | Não | Tipo: `loja`, `cliente`, `troca`, `presente` |
+| `starts_at` | date | Não | Início da validade (`YYYY-MM-DD`) |
+| `ends_at` | date | Não | Fim da validade (`YYYY-MM-DD`) |
+| `value` | decimal | Sim | Valor do desconto |
+| `type` | string | Sim | `$` = reais / `%` = percentual |
+| `value_start` | decimal | Não | Valor mínimo do produto para aplicar desconto |
+| `value_end` | decimal | Não | Valor máximo do produto para aplicar desconto |
+| `usage_sum_limit` | decimal | Não | Limite total acumulado de uso |
+| `usage_counter_limit` | integer | Não | Limite de usos totais do cupom |
+| `usage_counter_limit_customer` | integer | Não | Limite de usos por cliente |
+| `cumulative_discount` | number | Não | `1` = acumula com desconto progressivo |
+
+> **Campos `local_application`:** `loja`, `produtos`, `marcas`, `categorias`
+> **Campos `freight_application`:** `nao_aplicavel`, `desconto`, `frete_gratis`
 
 ## Exemplos
 
 ### Listar cupons
 
 ```http
-GET /coupons?access_token={token}&limit=30&page=1
+GET /discount_coupons?access_token={token}&limit=30&page=1
 ```
 
 Resposta:
 
 ```json
 {
-  "paging": {
-    "total": 85,
-    "page": 1,
-    "offset": 0,
-    "limit": 30,
-    "maxLimit": 50
-  },
-  "Coupons": [
+  "paging": { "total": 7, "page": 1, "offset": 0, "limit": 30, "maxLimit": 50 },
+  "DiscountCoupons": [
     {
-      "Coupon": {
-        "id": "123",
-        "code": "VERAO2026",
-        "discount_type": "percent",
-        "discount_value": "15.00",
-        "start_date": "2026-01-01",
-        "end_date": "2026-03-31",
-        "usage_limit": "500",
-        "minimum_purchase": "100.00",
-        "active": "1",
-        "cumulative": "0"
+      "DiscountCoupon": {
+        "id": "7",
+        "code": "NATAL25",
+        "description": "Cupom de Natal",
+        "value": "10.00",
+        "type": "%",
+        "starts_at": "2019-12-01",
+        "ends_at": "2019-12-31",
+        "usage_counter_limit": "0",
+        "coupon_type": "loja",
+        "local_application": "loja",
+        "freight_application": "nao_aplicavel",
+        "usage_counter_limit_customer": "10"
       }
     }
   ]
@@ -121,82 +188,111 @@ Resposta:
 ### Criar cupom
 
 ```http
-POST /coupons?access_token={token}
-Content-Type: application/json
+POST /discount_coupons?access_token={token}
+Content-Type: application/x-www-form-urlencoded
 
+["DiscountCoupon"]["code"]=PROMO10&["DiscountCoupon"]["description"]=Promo Abril&["DiscountCoupon"]["starts_at"]=2026-04-01&["DiscountCoupon"]["ends_at"]=2026-04-30&["DiscountCoupon"]["value"]=10.00&["DiscountCoupon"]["type"]=%&["DiscountCoupon"]["usage_counter_limit_customer"]=5
+```
+
+Estrutura JSON equivalente do body:
+
+```json
 {
-  "code": "PROMO10",
-  "discount_type": "percent",
-  "discount_value": 10,
-  "start_date": "2026-04-01",
-  "end_date": "2026-04-30",
-  "usage_limit": 200,
-  "minimum_purchase": 50.00,
-  "active": 1,
-  "cumulative": 0
+  "DiscountCoupon": {
+    "code": "PROMO10",
+    "description": "Promo Abril",
+    "starts_at": "2026-04-01",
+    "ends_at": "2026-04-30",
+    "value": "10.00",
+    "type": "%",
+    "usage_counter_limit": "",
+    "usage_counter_limit_customer": "5",
+    "cumulative_discount": "0"
+  }
 }
 ```
 
-### Atualizar cupom
+Resposta de sucesso:
 
-```http
-PUT /coupons/123?access_token={token}
-Content-Type: application/json
-
-{
-  "discount_value": 20,
-  "end_date": "2026-06-30"
-}
+```json
+{ "message": "Created", "id": "1", "code": 201 }
 ```
 
 ### Vincular produtos ao cupom
 
 ```http
-POST /coupons/123/products?access_token={token}
+POST /discount_coupons/create_relationship/7?access_token={token}
 Content-Type: application/json
 
 {
-  "product_id": [456, 789, 1011]
+  "DiscountCouponProduct": [
+    { "product_id": "456" },
+    { "product_id": "789" }
+  ]
 }
 ```
 
-### Vincular categorias ao cupom
+### Consultar clientes do cupom
 
 ```http
-POST /coupons/123/categories?access_token={token}
-Content-Type: application/json
+GET /discount_coupons/customer_relationship/7?access_token={token}
+```
 
+Resposta:
+
+```json
 {
-  "category_id": [10, 20]
+  "DiscountCouponCustomers": [
+    { "DiscountCouponCustomer": { "customer_id": "1" } },
+    { "DiscountCouponCustomer": { "customer_id": "20" } }
+  ]
 }
 ```
 
-### Criar cupom-presente
+## Tipos de Cupom — Lógica de Uso
 
-```http
-POST /coupons/123/gift_coupon?access_token={token}
-Content-Type: application/json
+| `coupon_type` | Comportamento |
+|:--|:--|
+| `loja` | Genérico — aplica a toda a loja e todos os clientes |
+| `cliente` | Restrito a clientes vinculados via `create_relationship` |
+| `troca` | Gerado a partir de um pedido (`order_id`) |
+| `presente` | Vincula a um produto como presente |
 
-{
-  "gift_value": 50.00,
-  "recipient_email": "cliente@email.com"
-}
-```
+> Cupom sem nenhum relacionamento criado = cupom genérico válido para toda a loja.
 
-### Excluir cupom-presente
+## Boas Práticas
 
-```http
-DELETE /coupons/123/gift_coupon?access_token={token}
-```
+- O campo `code` não aceita espaços nem acentos.
+- Campos `value_start` e `value_end` vazios = sem restrição de valor de produto.
+- `usage_counter_limit` e `usage_counter_limit_customer` precisam ser consistentes entre si — se o cliente pode usar 2 vezes, o limite geral não pode ser menor que 2.
+- Use `coupon_type=loja` sem relacionamentos para promoções gerais. Adicione relacionamentos para restrições.
+- Limite de 100 registros por POST de relacionamento — divida lotes maiores.
+- Consulte `coupon_type` e `local_application` no GET principal para saber qual endpoint de relacionamento chamar.
 
-## Boas Praticas
+## Como Usar no Claude Code
 
-- Sempre valide as datas de inicio e fim antes de criar um cupom. A `start_date` deve ser anterior a `end_date`.
-- Utilize `discount_type` corretamente: `percent` para descontos percentuais e `fixed` para valores absolutos.
-- Defina `usage_limit` para evitar uso excessivo de cupons promocionais.
-- Ao vincular produtos, categorias ou marcas, envie os IDs em lote para reduzir o numero de requisicoes.
-- Cupons cumulativos (`cumulative: true`) devem ser usados com cautela para nao comprometer a margem de lucro.
-- Utilize os endpoints de consulta de relacionamento (GET customers, GET products, etc.) para auditar quais entidades estao vinculadas ao cupom.
-- Ao excluir um cupom, verifique se nao existem pedidos pendentes que utilizam o codigo.
-- Respeite o limite de paginacao (maximo 50 registros por pagina) ao listar cupons.
-- Para cupons-presente, sempre valide o e-mail do destinatario antes do envio.
+### Exemplos de Prompt
+
+- "cria um cupom PROMO10 de 10% de desconto válido por 30 dias"
+- "cria um cupom de frete grátis para compras acima de R$ 150"
+- "vincula o cupom VIP20 exclusivamente aos clientes do perfil Atacado"
+- "lista todos os cupons ativos na loja"
+
+### O que o Claude faz
+
+1. Gera o código de criação com formato `x-www-form-urlencoded` e wrapper `DiscountCoupon`
+2. Define os campos de validade (`starts_at`, `ends_at`), tipo (`percentage`/`value`) e limites de uso
+3. Gera o código de relacionamento para cupons restritos a clientes, produtos ou categorias
+4. Orienta sobre a diferença entre `coupon_type` (loja/cliente/troca/presente)
+
+### O que você recebe
+
+- Código de criação de cupom com todos os campos configurados
+- Exemplo com `Content-Type: application/x-www-form-urlencoded` correto
+- Código de relacionamento via `POST /discount_coupons/create_relationship/:id`
+- Listagem de cupons ativos com filtros
+
+### Pré-requisitos
+
+- `access_token` configurado
+- `customer_id`, `product_id` ou `category_id` se o cupom tiver restrições de relacionamento

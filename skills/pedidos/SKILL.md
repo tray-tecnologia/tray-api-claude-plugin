@@ -5,6 +5,10 @@ description: >
   gerenciar o ciclo completo de pedidos: listagem com filtros, consulta de dados
   simples e completos, criação, atualização, cancelamento, e gestão de produtos
   dentro do pedido. Inclui todos os campos, status e fluxos de pedido.
+when_to_use: >
+  Use quando o desenvolvedor mencionar: pedido, order, status de pedido, cancelar pedido,
+  atualizar pedido, GET /orders, POST /orders, ciclo de vida do pedido, fluxo de compra
+  ou rastrear pedido.
 ---
 
 # API de Pedidos — Tray
@@ -92,3 +96,31 @@ Criação → Aguardando Pagamento → Pago → Em Separação → Enviado → E
 2. **Webhook de pedido** — configure o webhook `order` para receber notificações em tempo real
 3. **Código de rastreamento** — atualize o `tracking_number` quando o pedido for enviado
 4. **Não exclua pedidos** — use cancelamento ao invés de exclusão
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "lista os pedidos em aberto dos últimos 7 dias"
+- "busca os dados completos do pedido ID 1001 incluindo produtos e pagamento"
+- "cancela o pedido ID 2050"
+- "atualiza o código de rastreamento do pedido 1500"
+
+### O que o Claude faz
+
+1. Identifica a operação desejada (listar, consultar, atualizar ou cancelar)
+2. Usa `/orders/:id/full` para consultas completas e `/orders/:id` para dados básicos
+3. Gera o código com os filtros adequados na listagem (status, data, cliente)
+4. Inclui o tratamento da resposta e extração dos campos relevantes
+
+### O que você recebe
+
+- Código de consulta com os filtros aplicados e paginação configurada
+- Chamada para `/orders/:id/full` com os dados completos do pedido
+- Código de atualização com os campos necessários
+- Código de cancelamento via `PUT /orders/:id/cancel`
+
+### Pré-requisitos
+
+- `access_token` configurado
+- `order_id` disponível para operações em pedidos específicos

@@ -143,6 +143,12 @@ claude --plugin-dir ./tray-api-claude-plugin
 # Valida se sua integração está pronta para homologação
 ```
 
+## Planejamento
+
+Roadmap, trilhas de produto (hub de skills, confiabilidade, documentação para público misto) e checklist de smoke test: veja [docs/PLANEJAMENTO.md](docs/PLANEJAMENTO.md).
+
+Referências de **frontend / design system Tray** (paleta, tema, componentes) para evoluções como landing: [frontRefs/README.md](frontRefs/README.md).
+
 ## Contribuindo
 
 Contribuições são bem-vindas! Abra uma issue ou envie um pull request em [GitHub](https://github.com/tray-tecnologia/tray-api-claude-plugin).

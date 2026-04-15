@@ -78,3 +78,32 @@ Documentação oficial: https://developers.tray.com.br/#api-de-lista-de-preco-b2
 ## Paginação
 
 `limit` (máximo 50, padrão 30), `page`.
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "cria uma lista de preço Atacado Premium com preços específicos por produto"
+- "adiciona o produto 123 com preço R$ 79,90 à lista de preço ID 5"
+- "lista todas as listas de preço B2B disponíveis"
+- "implementa preços diferenciados para clientes atacadistas"
+
+### O que o Claude faz
+
+1. Gera o código de criação da lista com wrapper `PriceList`
+2. Gera o código de adição de valores por produto com wrapper `PriceListValue`
+3. Explica o fluxo: criar lista → adicionar valores → associar ao perfil de cliente
+4. Orienta sobre a combinação com `tray-perfis-cliente` para segmentação B2B
+
+### O que você recebe
+
+- Código de criação de lista de preço com nome e configuração
+- Código de adição de valores por `product_id` e `variant_id`
+- Fluxo completo de configuração B2B: lista → valores → perfil
+- Orientação sobre associação com grupos de clientes
+
+### Pré-requisitos
+
+- `access_token` configurado
+- Produtos já cadastrados com `product_id` disponível
+- Perfis de cliente configurados via `tray-perfis-cliente` (para associação)

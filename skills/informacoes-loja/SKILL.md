@@ -63,3 +63,27 @@ Este endpoint é ideal para:
   }
 }
 ```
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "valida se minha autenticação com a Tray está funcionando"
+- "consulta os dados da loja para configurar minha integração"
+- "verifica o status e o plano contratado da loja"
+
+### O que o Claude faz
+
+1. Gera o código para `GET /store?access_token={token}`
+2. Extrai os campos relevantes da resposta (status, plano, domínio)
+3. Inclui verificação de `status === "active"` antes de prosseguir com operações
+
+### O que você recebe
+
+- Código de consulta de dados da loja
+- Verificação de status ativo
+- Extração dos dados de configuração necessários para a integração
+
+### Pré-requisitos
+
+- `access_token` configurado (use `tray-autorizacao` primeiro)

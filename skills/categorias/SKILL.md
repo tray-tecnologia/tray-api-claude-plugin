@@ -63,3 +63,31 @@ Para reordenar categorias, use `PUT /categories/:id/order` com o campo `order` i
 1. **Crie categorias antes de produtos** — o `category_id` é obrigatório na criação de produto
 2. **Use a árvore pública** — para vitrines, use `/web_api/categories` sem autenticação
 3. **Hierarquia** — planeje a estrutura antes de criar (máximo de níveis varia por plano)
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "cria a estrutura de categorias da loja: Eletrônicos > Celulares e Eletrônicos > Notebooks"
+- "lista todas as categorias em formato de árvore hierárquica"
+- "como crio subcategorias dentro de uma categoria existente?"
+- "reordena as categorias por relevância"
+
+### O que o Claude faz
+
+1. Gera o código de criação de categoria pai (com `parent_id: 0`) e subcategorias
+2. Monta a hierarquia com chamadas sequenciais (pai antes do filho)
+3. Inclui o wrapper `Category` correto no body de cada chamada
+4. Demonstra como buscar a árvore completa com `GET /categories`
+
+### O que você recebe
+
+- Código de criação de categorias com hierarquia correta
+- Sequência de chamadas respeitando a dependência pai → filho
+- Código de consulta da árvore completa
+- Exemplo de reordenação via `PUT /categories/:id/order`
+
+### Pré-requisitos
+
+- `access_token` configurado
+- Estrutura de categorias planejada previamente (nomes e hierarquia)

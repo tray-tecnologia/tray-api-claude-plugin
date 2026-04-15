@@ -22,15 +22,18 @@ Criação → Aguardando Pagamento → Pago → Em Separação → Enviado → E
 
 ## 2. Gestão de Status
 
-- Listar status disponíveis (`GET /order-statuses`)
-- Criar status personalizados (`POST /order-statuses`)
+- Listar status disponíveis (`GET /orders/statuses`)
+- Criar status personalizados (`POST /orders/statuses`)
 - Atualizar status do pedido seguindo regras de negócio
 
 ## 3. Notas Fiscais (NF-e)
 
-- Cadastrar nota fiscal vinculada ao pedido (`POST /invoices`)
-- Campos obrigatórios: `number`, `series`, `order_id`, `key` (chave de acesso)
-- Consultar NF por pedido (`GET /invoices/order/:order_id`)
+- Cadastrar nota fiscal vinculada ao pedido (`POST /orders/:id/invoices`)
+- Campos obrigatórios: `number`, `series`, `key` (chave de acesso NF-e)
+- Listar todas as NFs (`GET /orders/invoices`)
+- Consultar NFs de um pedido (`GET /orders/:id/invoices`)
+- Consultar NF específica (`GET /orders/:order_id/invoices/:invoice_id`)
+- Atualizar NF (`PUT /orders/:order_id/invoices/:invoice_id`)
 - URL do DANFE via campo `link`
 
 ## 4. Etiquetas de Envio

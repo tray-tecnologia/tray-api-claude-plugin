@@ -6,6 +6,10 @@ description: >
   cadastro, atualização, exclusão de CDs, gestão de estoque por produto/variação
   em cada CD, e configuração de prioridade e cobertura regional. Inclui documentação
   de webhooks para sincronização de estoque entre sistemas.
+when_to_use: >
+  Use quando o desenvolvedor mencionar: MultiCD, multi-cd, centro de distribuição,
+  CD, estoque por CD, distribution center, estoque distribuído, /multicd,
+  sincronizar estoque entre depósitos ou estoque regionalizado.
 ---
 
 # API de Multi-CD (Centros de Distribuição) — Tray
@@ -16,20 +20,19 @@ Documentação oficial: https://developers.tray.com.br/#api-de-multicd
 
 | Método | Endpoint | Descrição |
 |:--|:--|:--|
-| GET | `/distribution_centers` | Listar centros de distribuição |
-| GET | `/distribution_centers/:id` | Consultar CD por ID |
-| POST | `/distribution_centers` | Cadastrar novo centro de distribuição |
-| PUT | `/distribution_centers/:id` | Atualizar dados do CD |
-| DELETE | `/distribution_centers/:id` | Excluir centro de distribuição |
+| GET | `/multicd/distribution-centers` | Listar centros de distribuição |
+| GET | `/multicd/distribution-centers/:id` | Consultar CD por ID |
+| POST | `/multicd/distribution-centers` | Cadastrar novo centro de distribuição |
+| PUT | `/multicd/distribution-centers/:id` | Atualizar dados do CD |
+| DELETE | `/multicd/distribution-centers/:id` | Excluir centro de distribuição |
 
 ## Endpoints — Estoque por CD
 
 | Método | Endpoint | Descrição |
 |:--|:--|:--|
-| GET | `/distribution_centers/:dc_id/products` | Listar estoque de produtos no CD |
-| GET | `/distribution_centers/:dc_id/products/:product_id` | Consultar estoque de um produto no CD |
-| PUT | `/distribution_centers/:dc_id/products/:product_id` | Atualizar estoque do produto no CD |
-| PUT | `/distribution_centers/:dc_id/variants/:variant_id` | Atualizar estoque da variação no CD |
+| GET | `/multicd/stock/detailed/product/:id` | Consultar estoque detalhado de produto em todos os CDs |
+| GET | `/multicd/stock/detailed/variant/:id` | Consultar estoque detalhado de variação em todos os CDs |
+| PUT | `/multicd/distribution-centers/:id/stock` | Atualizar estoque do CD (produto ou variação) |
 
 **Autenticação:** `?access_token={token}` em todas as chamadas.
 
@@ -194,26 +197,24 @@ Quando um pedido é realizado, a Tray seleciona o CD com base nos seguintes crit
 
 ## Webhooks de Estoque
 
-A Tray pode disparar webhooks quando o estoque de um CD é alterado, permitindo sincronização em tempo real com ERPs e sistemas externos.
+Quando o MultiCD está ativo, a Tray dispara webhooks nos escopos `product_stock` e `variant_stock` para qualquer alteração de estoque em qualquer CD, permitindo sincronização em tempo real com ERPs e sistemas externos.
 
-| Evento | Descrição |
-|:--|:--|
-| `product_stock` | Disparado quando o estoque de um produto é alterado em qualquer CD |
-| `variant_stock` | Disparado quando o estoque de uma variação é alterado em qualquer CD |
+| Evento (`scope_name`) | `act` | Descrição |
+|:--|:--|:--|
+| `product_stock` | `update` | Estoque de produto alterado em qualquer CD |
+| `variant_stock` | `update` | Estoque de variação alterado em qualquer CD |
 
 ### Payload do Webhook
 
-```json
-{
-  "event": "product_stock",
-  "product_id": 100,
-  "distribution_center_id": 1,
-  "stock": 50,
-  "previous_stock": 55
-}
+O formato é **`application/x-www-form-urlencoded`** (igual a todos os webhooks da Tray):
+
+```
+seller_id=391250&scope_id=100&scope_name=product_stock&act=update&app_code=718&url_notification=https://suaurldenotificacao
 ```
 
-Configure webhooks via o skill `tray-webhooks`.
+O `scope_id` corresponde ao ID do produto ou variação alterada. Após receber o webhook, consulte `GET /multicd/stock/detailed/product/:id` para obter os estoques atualizados por CD.
+
+> Para detalhes completos sobre formato de payload, campos e lógica de retry, consulte o skill `tray-webhooks`.
 
 ## Boas Práticas
 
@@ -223,5 +224,34 @@ Configure webhooks via o skill `tray-webhooks`.
 4. **Estoque total** — o estoque exibido na vitrine é a soma do estoque de todos os CDs ativos
 5. **Variações por CD** — se o produto tem variações, gerencie o estoque de cada variação individualmente por CD
 6. **Desative antes de excluir** — mude `active` para `0` antes de excluir um CD para evitar impacto em pedidos
-7. **Teste o cálculo de frete** — após configurar CDs, teste o frete com diferentes CEPs usando o skill `tray-frete`
+7. **Teste o cálculo de frete** — após configurar CDs, teste o frete com diferentes CEPs usando o skill `tray-frete` (`GET /shippings/cotation/`)
 8. **Recursos relacionados** — consulte os skills `tray-frete`, `tray-configuracao-frete` e `tray-webhooks`
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "cadastra os centros de distribuição de SP (prioritário) e MG"
+- "atualiza o estoque do produto 100 para 150 unidades no CD de São Paulo"
+- "implementa a sincronização de estoque por CD via webhook"
+- "consulta o estoque detalhado do produto 100 em todos os CDs"
+
+### O que o Claude faz
+
+1. Gera o código de criação de CD com wrapper `DistributionCenter` e configuração de prioridade
+2. Gera o código de atualização de estoque por CD (produto ou variação)
+3. Implementa o fluxo de recebimento de webhook `product_stock` e atualização via API
+4. Demonstra a consulta de estoque detalhado por CD
+
+### O que você recebe
+
+- Código de criação de CDs com prioridade e cobertura regional
+- Código de atualização de estoque: `PUT /multicd/distribution-centers/:id/stock`
+- Fluxo de sincronização via webhook `product_stock` + consulta detalhada
+- Consulta de estoque por produto em todos os CDs
+
+### Pré-requisitos
+
+- `access_token` configurado
+- MultiCD ativo na loja (configurado no painel Tray)
+- Produtos já cadastrados com `product_id` disponível

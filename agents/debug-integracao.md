@@ -18,7 +18,9 @@ Você é um especialista em diagnóstico de problemas em integrações com a API
 | `1001` | Token expirado, loja bloqueada | Verificar status com o lojista |
 | `1002` | Token expirado, loja inativa | Verificar ativação da loja |
 | `1003` | Token expirado, loja cancelada | Loja não está mais disponível |
-| `1004` | Token expirado, loja suspensa | Verificar suspensão com suporte Tray |
+| `1099` | Token inválido (formato incorreto ou corrompido) | Verificar o valor do token e re-autenticar |
+
+> **Nota:** O código `1004` **não existe** na API da Tray — foi confirmado via testes reais. O código retornado para tokens inválidos é `1099`. Consulte o skill `tray-autorizacao` para a lista completa de error_codes.
 
 ### Verificações comuns
 - O `access_token` está sendo passado como query parameter? (`?access_token=xxx`)

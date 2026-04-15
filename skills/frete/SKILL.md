@@ -15,28 +15,26 @@ Documentação oficial: https://developers.tray.com.br/#api-de-integracao-de-fre
 
 | Método | Endpoint | Descrição |
 |:--|:--|:--|
-| GET | `/shipping` | Calcular frete para um CEP com peso e dimensões |
-| GET | `/shipping/methods` | Listar métodos/formas de envio disponíveis na loja |
+| GET | `/shippings/cotation/` | Calcular frete para um ou mais produtos por CEP |
+| GET | `/shippings/` | Listar formas de envio disponíveis na loja |
 
 **Autenticação:** `?access_token={token}` em todas as chamadas.
 
-## Parâmetros do Cálculo de Frete
+## Parâmetros do Cálculo de Frete (`/shippings/cotation/`)
 
 | Parâmetro | Tipo | Obrigatório | Descrição |
 |:--|:--|:--|:--|
-| `zipcode` | string | Sim | CEP de destino (apenas números, ex: "01304001") |
-| `weight` | number | Sim | Peso total em gramas (ex: 1000 para 1kg) |
-| `length` | number | Sim | Comprimento em cm |
-| `width` | number | Sim | Largura em cm |
-| `height` | number | Sim | Altura em cm |
-| `product_id` | number | Não | ID do produto (para cálculo com dados do produto) |
-| `quantity` | number | Não | Quantidade de itens |
-| `variant_id` | number | Não | ID da variação do produto |
+| `zipcode` | string | Sim | CEP de destino (apenas números, ex: "04001001") |
+| `products[n][product_id]` | number | Sim | ID do produto (índice n começa em 0) |
+| `products[n][price]` | decimal | Sim | Preço do produto |
+| `products[n][quantity]` | number | Sim | Quantidade do produto |
+
+> A rota aceita múltiplos produtos na mesma requisição usando índices `products[0]`, `products[1]`, etc.
 
 ## Exemplo de Requisição — Cálculo de Frete
 
 ```
-GET /shipping?access_token={token}&zipcode=01304001&weight=1000&length=30&width=20&height=10
+GET /shippings/cotation/?access_token={token}&zipcode=04001001&products[0][product_id]=123&products[0][price]=58.90&products[0][quantity]=2
 ```
 
 ## Exemplo de Resposta — Cálculo de Frete
@@ -125,4 +123,33 @@ A configuração do gateway de frete é feita no painel administrativo da Tray o
 4. **Cache de resultados** — o cálculo de frete pode ser lento por depender de APIs externas; considere cachear resultados por CEP + peso + dimensões
 5. **Tratamento de erros** — nem sempre todos os métodos retornam resultado; trate o cenário de frete indisponível para determinada região
 6. **Frete grátis** — produtos com `free_shipping: 1` podem retornar frete zerado dependendo da configuração da loja
-7. **Recursos relacionados** — consulte o skill `tray-configuracao-frete` para gerenciar métodos de envio e tabelas de CEP
+7. **Recursos relacionados** — consulte o skill `tray-configuracao-frete` (`/shippings/method/gateway`, `/shippings/method/zipcode_table`) para gerenciar métodos de envio e tabelas de CEP
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "calcula o frete para o CEP 01310100 para 2 unidades do produto 123"
+- "lista os métodos de envio disponíveis na loja"
+- "implementa o cálculo de frete com cache por CEP para evitar chamadas repetidas"
+- "calcula o frete para um carrinho com 3 produtos diferentes"
+
+### O que o Claude faz
+
+1. Gera o código de requisição para `GET /shippings/cotation/` com os parâmetros indexados
+2. Monta os índices `products[0]`, `products[1]`... para múltiplos produtos
+3. Implementa cache de resultados por CEP + produtos quando solicitado
+4. Trata o cenário de frete indisponível para determinada região
+
+### O que você recebe
+
+- Código de cálculo de frete com CEP e produtos indexados corretamente
+- Tratamento da resposta com nome, preço e prazo de cada método
+- Implementação de cache para otimizar chamadas repetidas
+- Código de listagem de métodos via `GET /shippings/`
+
+### Pré-requisitos
+
+- `access_token` configurado
+- `product_id` e `price` dos produtos disponíveis
+- CEP de destino

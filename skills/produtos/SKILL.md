@@ -5,6 +5,10 @@ description: >
   consultar, cadastrar, atualizar ou excluir produtos no catálogo de uma loja Tray.
   Inclui todos os campos do produto (nome, preço, estoque, EAN, NCM, dimensões,
   SEO), filtros de listagem, paginação, ordenação e exclusão de kits.
+when_to_use: >
+  Use quando o desenvolvedor mencionar: cadastrar produto, atualizar produto,
+  sincronizar catálogo, preço, estoque, EAN, SKU, imagem de produto, POST /products,
+  PUT /products, variação de produto ou importar produtos.
 ---
 
 # API de Produtos — Tray
@@ -146,3 +150,32 @@ O endpoint `GET /products/:id` retorna o objeto `Product` com dados adicionais:
 - `all_categories` — todas as categorias
 - `ProductImage` — array de imagens com thumbnails (30px, 90px, 180px em HTTP e HTTPS)
 - `Variant` — array de variações do produto
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "cadastra um novo produto na loja com preço, estoque e categoria"
+- "atualiza o estoque e o preço promocional do produto ID 123"
+- "lista todos os produtos sem estoque disponível"
+- "como filtro produtos por categoria e faixa de preço?"
+
+### O que o Claude faz
+
+1. Identifica a operação desejada (criar, atualizar, listar ou consultar)
+2. Gera o código com o wrapper `Product` obrigatório no body
+3. Inclui os campos relevantes para o caso de uso (preço, estoque, dimensões, SEO)
+4. Adiciona paginação e filtros se for listagem
+
+### O que você recebe
+
+- Código funcional da chamada à API com todos os campos necessários
+- Wrapper `{"Product": {...}}` correto no body
+- Parâmetros de paginação (`limit`, `page`) e filtros aplicados
+- Tratamento da resposta com os IDs gerados
+
+### Pré-requisitos
+
+- `access_token` configurado
+- `category_id` válido se for criar produto (use `tray-categorias` antes)
+- `brand_id` válido se quiser associar marca (use `tray-marcas` antes)

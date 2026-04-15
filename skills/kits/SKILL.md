@@ -126,3 +126,32 @@ Documentação oficial: https://developers.tray.com.br/#api-de-kit
 4. **Preço do kit** — defina o preço do produto-kit diretamente no cadastro do produto principal
 5. **Evite loops** — não inclua um kit como componente de outro kit
 6. **Para excluir** — use `DELETE /kits/:id` da API de Produtos para remover o vínculo do kit
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "cria um kit com 2 camisetas + 1 boné a partir dos produtos 101, 102 e 103"
+- "como configuro um combo promocional de produtos?"
+- "lista todos os kits cadastrados na loja"
+- "atualiza a quantidade do produto 101 dentro do kit 50"
+
+### O que o Claude faz
+
+1. Guia o fluxo de 3 etapas: criação do produto-kit → associação de componentes → definição de quantidades
+2. Gera código sequencial com os IDs necessários em cada etapa
+3. Explica o cálculo automático de estoque (menor estoque entre os componentes)
+4. Inclui o wrapper `Kit` correto no body de cada chamada
+
+### O que você recebe
+
+- Código do fluxo completo de criação de kit com múltiplos componentes
+- Sequência correta de chamadas (produto pai → POST `/products/kits` para cada componente)
+- Exemplo de atualização de quantidade com `PUT /products/kits/:id`
+- Nota sobre como excluir via `DELETE /kits/:id`
+
+### Pré-requisitos
+
+- Produto-kit (produto principal do combo) já cadastrado via `tray-produtos`
+- Produtos componentes já cadastrados com IDs disponíveis
+- `access_token` configurado

@@ -6,6 +6,10 @@ description: >
   renovar tokens expirados via refresh_token, ou tratar erros de autenticação
   na plataforma Tray. Inclui o fluxo completo de 3 etapas, campos de resposta,
   tempos de expiração e códigos de erro.
+when_to_use: >
+  Use quando o desenvolvedor mencionar: autenticação, OAuth, access_token, refresh_token,
+  consumer_key, consumer_secret, erro 401, token expirado, como conectar à API da Tray,
+  primeiras credenciais, fluxo de autorização ou callback de autenticação.
 ---
 
 # Autorização — API Tray
@@ -108,7 +112,9 @@ POST https://{api_address}/products?access_token={access_token}
 | `1001` | Token expirado, loja bloqueada | Verificar status com o lojista |
 | `1002` | Token expirado, loja inativa | Verificar ativação da loja |
 | `1003` | Token expirado, loja cancelada | Loja não está mais disponível |
-| `1004` | Token expirado, loja suspensa | Verificar suspensão com suporte Tray |
+| `1099` | Token inválido ou expirado (motivo desconhecido) | Verificar token e refazer autenticação |
+
+> **Nota:** o campo retornado pela API é `error_code` (não `code`). Validado em teste real: token inválido retorna `error_code: 1099` com HTTP 401.
 
 **Resposta de erro (401):**
 
@@ -135,6 +141,35 @@ A API retorna HTTP 429 quando o limite é atingido. Implemente backoff exponenci
 
 1. **Nunca hardcode tokens** — use variáveis de ambiente (`TRAY_ACCESS_TOKEN`, `TRAY_CONSUMER_KEY`, `TRAY_CONSUMER_SECRET`)
 2. **Renove antes de expirar** — agende renovação antes das 3 horas (ex: a cada 2h30)
-3. **Trate todos os códigos** — implemente tratamento para códigos 1000 a 1004
+3. **Trate todos os códigos** — implemente tratamento para códigos 1000, 1001, 1002, 1003 e 1099
 4. **Backoff exponencial** — para erros 429, aguarde progressivamente (1s, 2s, 4s, 8s...)
 5. **Armazene o api_address** — ele é específico por loja e retornado no callback
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "implementa o fluxo OAuth completo com a API da Tray"
+- "como conecto minha aplicação à Tray pela primeira vez?"
+- "adiciona renovação automática do access_token antes de expirar"
+- "como trato o erro 1099 da Tray na autenticação?"
+
+### O que o Claude faz
+
+1. Explica o fluxo OAuth 2.0 de 3 etapas (redirecionamento → callback → geração de tokens)
+2. Gera o código de autenticação na linguagem e framework do projeto
+3. Implementa a lógica de renovação automática via `refresh_token` antes das 3 horas
+4. Adiciona tratamento específico para cada código de erro (1000–1003, 1099)
+5. Documenta as variáveis de ambiente necessárias
+
+### O que você recebe
+
+- Código funcional do fluxo OAuth pronto para integrar
+- Helper ou middleware de renovação automática de tokens
+- Handler com os 5 códigos de erro de autenticação mapeados
+- Exemplo de `.env` com todas as variáveis necessárias
+
+### Pré-requisitos
+
+- `consumer_key` e `consumer_secret` do seu app na Tray (obtidos no painel de parceiros)
+- URL de callback configurada e acessível publicamente

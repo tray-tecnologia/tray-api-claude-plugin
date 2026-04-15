@@ -115,3 +115,30 @@ A Tray já possui status padrão pré-configurados que não podem ser excluídos
 4. **Nomeie de forma clara** — o nome do status é exibido para o cliente no acompanhamento do pedido
 5. **Status padrão** — os status padrão da plataforma não podem ser editados ou excluídos; crie novos para personalizar
 6. **Webhook** — ao alterar o status de um pedido, o webhook `order` é disparado automaticamente
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "cria os status personalizados: Em Separação, Aguardando Retirada e Despachado"
+- "lista todos os status de pedido disponíveis na loja"
+- "atualiza a cor e descrição do status ID 15"
+- "como configuro o fluxo de status para uma loja com retirada em loja?"
+
+### O que o Claude faz
+
+1. Gera o código de criação com wrapper `OrderStatus` e cores em hexadecimal
+2. Define o `type` correto para cada status (open/closed/cancelled)
+3. Explica os status padrão da plataforma que não podem ser modificados
+4. Sugere um fluxo de status adequado ao caso de uso descrito
+
+### O que você recebe
+
+- Código de criação de status com nome, cores e tipo configurados
+- Sequência de criação para um fluxo de status completo
+- Listagem dos status existentes via `GET /orders/statuses`
+- Nota sobre status padrão da plataforma vs. personalizados
+
+### Pré-requisitos
+
+- `access_token` configurado

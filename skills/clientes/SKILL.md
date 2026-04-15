@@ -75,3 +75,31 @@ Documentação oficial: https://developers.tray.com.br/#api-de-clientes
 2. **Valide CPF/CNPJ** — antes de enviar, valide localmente para evitar erros 400
 3. **Newsletter opt-in** — respeite a LGPD, envie `newsletter: 1` apenas com consentimento
 4. **Webhook** — configure o webhook `customer` para receber notificações de alterações
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "cadastra um novo cliente pessoa física com CPF e telefone"
+- "busca o cliente pelo e-mail joao@exemplo.com"
+- "lista todos os clientes inscritos na newsletter"
+- "implementa a sincronização de clientes do meu ERP para a Tray"
+
+### O que o Claude faz
+
+1. Gera o código de criação com wrapper `Customer` e validação de CPF/CNPJ
+2. Usa filtros de listagem (`email`, `cpf`, `newsletter`) para buscas específicas
+3. Inclui tratamento de erro para e-mail duplicado (cliente já existente)
+4. Sugere o fluxo completo: cliente → endereço → perfil quando necessário
+
+### O que você recebe
+
+- Código de criação com wrapper `{"Customer": {...}}` e campos obrigatórios
+- Validação local de CPF/CNPJ antes da chamada à API
+- Código de busca por e-mail ou CPF via filtros de listagem
+- Orientação sobre campos LGPD (`newsletter`)
+
+### Pré-requisitos
+
+- `access_token` configurado
+- E-mail único por cliente

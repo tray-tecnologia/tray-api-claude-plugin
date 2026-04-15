@@ -23,6 +23,8 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
 
 **Autenticação:** `?access_token={token}` em todas as chamadas.
 
+> **Alias não oficial:** a rota `/brands` (sem o prefixo `/products/`) também retorna HTTP 200 nesta API, mas não é documentada oficialmente pela Tray. Use sempre `/products/brands` para garantir compatibilidade e aderência à documentação oficial.
+
 ## Campos da Marca
 
 | Campo | Tipo | Obrigatório | Descrição |
@@ -117,3 +119,31 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
 3. **Evite duplicidade** — consulte a listagem antes de criar para evitar marcas duplicadas
 4. **Imagem da marca** — forneça uma URL pública e acessível para o logotipo; formatos recomendados: PNG ou JPG
 5. **Exclusão segura** — não exclua marcas que possuam produtos associados; reatribua os produtos antes
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "cadastra as marcas Nike, Adidas e Puma com seus logos"
+- "lista todas as marcas disponíveis na loja"
+- "verifica se a marca Samsung já existe antes de criar"
+- "atualiza o logo e a descrição da marca ID 10"
+
+### O que o Claude faz
+
+1. Gera o código de criação com wrapper `Brand` e slug automático
+2. Inclui verificação de duplicidade via `GET /products/brands?name=...` antes de criar
+3. Monta o payload com nome, slug, descrição e URL do logo
+4. Explica que o `brand_id` retornado deve ser usado ao cadastrar produtos
+
+### O que você recebe
+
+- Código de criação de marca com wrapper `{"Brand": {...}}` correto
+- Verificação de duplicidade antes de criar
+- `brand_id` extraído da resposta para uso em produtos
+- Código de listagem com paginação
+
+### Pré-requisitos
+
+- `access_token` configurado
+- URLs públicas dos logos (opcional, mas recomendado)

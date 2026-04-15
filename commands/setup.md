@@ -1,5 +1,7 @@
 ---
+name: tray-setup
 description: Guia rápido para configuração inicial de integração com a API da Tray
+disable-model-invocation: true
 ---
 
 # Configuração Rápida — API Tray

@@ -1,5 +1,7 @@
 ---
+name: tray-validar-integracao
 description: Valida o código de integração com a Tray verificando problemas comuns e boas práticas
+disable-model-invocation: true
 ---
 
 # Validação de Integração — Tray

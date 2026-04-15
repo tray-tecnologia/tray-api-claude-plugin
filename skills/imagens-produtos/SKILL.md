@@ -74,3 +74,32 @@ Para remover imagens, envie um POST para `/images/remove` com o ID da imagem.
 2. **Use URLs quando possível** — evita o overhead de Base64 (33% maior)
 3. **Defina a posição** — a imagem de posição 1 é a imagem principal do produto
 4. **Formatos aceitos** — JPG, PNG, GIF
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "faz upload das imagens para o produto 123 a partir de URLs"
+- "define a imagem principal do produto e mais 3 imagens secundárias"
+- "como envio imagens de variações separadas do produto?"
+- "remove a imagem ID 55 do produto"
+
+### O que o Claude faz
+
+1. Gera o código de upload via URL ou Base64 conforme o caso
+2. Define o campo `position` (1 = principal, 2, 3... para as demais)
+3. Diferencia o endpoint de produto (`/products/:id/images`) do de variação (`/variants/:id/images`)
+4. Explica os thumbnails gerados automaticamente (30px, 90px, 180px)
+
+### O que você recebe
+
+- Código de upload com wrapper `{"ProductImage": {...}}` correto
+- Lógica de posicionamento para múltiplas imagens
+- Exemplos separados para produto e variação
+- Código de remoção via `/images/remove`
+
+### Pré-requisitos
+
+- Produto ou variação já cadastrado com ID disponível
+- URLs das imagens públicas e acessíveis (para envio via URL)
+- `access_token` configurado

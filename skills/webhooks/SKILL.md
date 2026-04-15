@@ -5,6 +5,10 @@ description: >
   precisar implementar notificações em tempo real para alterações em produtos,
   pedidos, clientes, variações e configurações da loja. Inclui todos os escopos
   suportados, formato de payload, lógica de retry e boas práticas de implementação.
+when_to_use: >
+  Use quando o desenvolvedor mencionar: webhook, notificação, evento, listener,
+  endpoint receptor, escopo de notificação, product_stock, order_insert,
+  payload x-www-form-urlencoded, retry de notificação ou sincronização em tempo real.
 ---
 
 # Sistema de Notificação (Webhook) — API Tray
@@ -27,11 +31,15 @@ Os webhooks devem ser ativados via **ticket de suporte da Tray**, informando a U
 | `variant_stock` | update | Alteração de estoque de variação |
 | `order` | insert, update | Criação ou atualização de pedido |
 | `customer` | insert, update, delete | Criação, atualização ou exclusão de cliente |
-| `store_config` | update | Alteração de configuração da loja |
+| `store_config` | update | Alteração de configuração da loja (inclui ativação de MultiCD) |
+
+> **Ativação de escopos:** por padrão, a Tray libera apenas o escopo `order`. Para habilitar outros escopos, abra um chamado no suporte Tray informando a URL de notificação e os escopos desejados.
+
+> **Sobre pagamentos:** **não existe escopo de webhook `payment`**. Notificações de pagamento chegam via escopo `order` — o objeto de pedido retornado pela API contém o campo `payments_notification` com a URL e os dados de pagamento. Consulte o skill `tray-pagamentos` para detalhes.
 
 ## Formato do Payload
 
-O webhook envia um POST com `Content-Type: application/x-www-form-urlencoded`:
+O webhook envia um POST com `Content-Type: application/x-www-form-urlencoded` — **sempre**, incluindo os de MultiCD.
 
 | Campo | Tipo | Descrição |
 |:--|:--|:--|
@@ -39,11 +47,36 @@ O webhook envia um POST com `Content-Type: application/x-www-form-urlencoded`:
 | `scope_id` | integer | ID do recurso afetado (ex: ID do produto) |
 | `scope_name` | string | Nome do escopo (ex: `product`, `order`) |
 | `act` | string | Ação realizada: `insert`, `update` ou `delete` |
+| `app_code` | string | Código do aplicativo que recebe a notificação |
+| `url_notification` | string | URL de notificação cadastrada no aplicativo |
 
-**Exemplo de payload:**
+**Exemplo de payload completo:**
 
 ```
-seller_id=123456&scope_id=789&scope_name=product&act=update
+seller_id=391250&scope_id=4375797&scope_name=order&act=update&app_code=718&url_notification=https://suaurldenotificacao
+```
+
+**Leitura em PHP:**
+
+```php
+$sellerID  = $_POST["seller_id"];
+$scopeName = $_POST["scope_name"];
+$scopeID   = $_POST["scope_id"];
+$act       = $_POST["act"];
+
+switch ($scopeName . "_" . $act) {
+    case "product_insert":
+    case "product_update":
+        $productID = $scopeID;
+        break;
+    case "order_insert":
+    case "order_update":
+        $orderID = $scopeID;
+        break;
+    case "customer_delete":
+        $customerID = $scopeID;
+        break;
+}
 ```
 
 ## Lógica de Retry
@@ -73,3 +106,32 @@ Ao receber um webhook, seu endpoint deve:
 2. Extrair `scope_name`, `scope_id` e `act` do payload
 3. Se necessário, consultar a API Tray para obter dados completos
 4. Processar a alteração na sua aplicação
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "implementa um endpoint receptor de webhooks da Tray em Node.js"
+- "cria a lógica de processamento para os eventos order_insert e order_update"
+- "como configuro meu app para receber notificações de estoque em tempo real?"
+- "implementa tratamento de webhooks com fila assíncrona e idempotência"
+
+### O que o Claude faz
+
+1. Gera o endpoint receptor com leitura do payload `x-www-form-urlencoded`
+2. Implementa o switch por `scope_name + "_" + act` para rotear eventos
+3. Adiciona resposta imediata HTTP 200 + processamento assíncrono via fila
+4. Inclui validação do `seller_id` e tratamento de duplicatas (idempotência)
+
+### O que você recebe
+
+- Endpoint receptor com parsing correto de `application/x-www-form-urlencoded`
+- Switch de roteamento por evento (order_insert, product_stock, customer_update, etc.)
+- Lógica de resposta rápida + processamento em background
+- Handler de idempotência para evitar processamento duplicado
+
+### Pré-requisitos
+
+- URL de endpoint publicamente acessível (HTTPS recomendado)
+- Ativação do webhook via ticket de suporte Tray informando a URL
+- `access_token` configurado para chamadas complementares à API

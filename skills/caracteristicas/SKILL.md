@@ -1,13 +1,13 @@
 ---
 name: tray-caracteristicas
 description: >
-  API de Caracteristicas de Produtos da Tray. Utilize quando o desenvolvedor
-  precisar gerenciar caracteristicas (propriedades) dos produtos, incluindo cadastro,
-  atualização, consulta e exclusão. Permite criar caracteristicas globais reutilizáveis
-  e associar valores especificos a cada produto (ex: cor, tamanho, material, voltagem).
+  API de Características de Produtos da Tray. Utilize quando o desenvolvedor
+  precisar gerenciar características (propriedades) dos produtos, incluindo cadastro,
+  atualização, consulta e exclusão. Permite criar características globais reutilizáveis
+  e associar valores específicos a cada produto (ex: cor, tamanho, material, voltagem).
 ---
 
-# API de Caracteristicas de Produtos — Tray
+# API de Características de Produtos — Tray
 
 Documentação oficial: https://developers.tray.com.br/#apis-de-caracteristicas
 
@@ -15,27 +15,27 @@ Documentação oficial: https://developers.tray.com.br/#apis-de-caracteristicas
 
 | Método | Endpoint | Descrição |
 |:--|:--|:--|
-| GET | `/products/:product_id/properties` | Listar caracteristicas de um produto |
-| POST | `/products/:product_id/properties` | Cadastrar ou atualizar caracteristica no produto |
-| POST | `/properties` | Criar caracteristica global (reutilizável em vários produtos) |
-| DELETE | `/products/:product_id/properties/:id` | Excluir caracteristica de um produto |
+| GET | `/products/:product_id/properties` | Listar características de um produto |
+| POST | `/products/:product_id/properties` | Cadastrar ou atualizar característica no produto |
+| POST | `/properties` | Criar característica global (reutilizável em vários produtos) |
+| DELETE | `/products/:product_id/properties/:id` | Excluir característica de um produto |
 
 **Autenticação:** `?access_token={token}` em todas as chamadas.
 
-## Campos da Caracteristica
+## Campos da Característica
 
 | Campo | Tipo | Obrigatório | Descrição |
 |:--|:--|:--|:--|
-| `id` | number | — | ID da caracteristica (retornado pela API) |
-| `property` | string | Sim | Nome da caracteristica (ex: "Cor", "Material") |
-| `value` | string | Sim | Valor da caracteristica (ex: "Azul", "Algodão") |
+| `id` | number | — | ID da característica (retornado pela API) |
+| `property` | string | Sim | Nome da característica (ex: "Cor", "Material") |
+| `value` | string | Sim | Valor da característica (ex: "Azul", "Algodão") |
 | `product_id` | number | Sim | ID do produto associado |
 
-## Campos da Caracteristica Global
+## Campos da Característica Global
 
 | Campo | Tipo | Obrigatório | Descrição |
 |:--|:--|:--|:--|
-| `name` | string | Sim | Nome da caracteristica global |
+| `name` | string | Sim | Nome da característica global |
 | `presentation` | string | Não | Tipo de apresentação (ex: "select", "text") |
 
 ## Corpo da Requisição — Cadastrar/Atualizar no Produto (POST)
@@ -49,7 +49,7 @@ Documentação oficial: https://developers.tray.com.br/#apis-de-caracteristicas
 }
 ```
 
-## Corpo da Requisição — Criar Caracteristica Global (POST)
+## Corpo da Requisição — Criar Característica Global (POST)
 
 ```json
 {
@@ -68,7 +68,7 @@ Documentação oficial: https://developers.tray.com.br/#apis-de-caracteristicas
 | Atualização | 200 | `{"message": "Saved", "id": 123, "code": 200}` |
 | Exclusão | 200 | `{"message": "Deleted", "id": 123, "code": 200}` |
 
-## Exemplo de Resposta — Listar Caracteristicas
+## Exemplo de Resposta — Listar Características
 
 ```json
 {
@@ -95,8 +95,36 @@ Documentação oficial: https://developers.tray.com.br/#apis-de-caracteristicas
 
 ## Boas Práticas
 
-1. **Use caracteristicas globais** — crie caracteristicas globais com `POST /properties` para padronizar nomes e evitar duplicidade
+1. **Use características globais** — crie características globais com `POST /properties` para padronizar nomes e evitar duplicidade
 2. **Padronize valores** — mantenha consistência nos valores (ex: sempre "Azul" e nunca "azul" ou "AZUL")
-3. **Consulte antes de criar** — verifique as caracteristicas existentes do produto antes de adicionar novas
-4. **Caracteristicas para filtros** — as caracteristicas são usadas como filtros na vitrine; escolha nomes claros para o consumidor final
-5. **Não confunda com variações** — caracteristicas são informativas; para opções que geram SKUs diferentes (estoque separado), use variações
+3. **Consulte antes de criar** — verifique as características existentes do produto antes de adicionar novas
+4. **Características para filtros** — as características são usadas como filtros na vitrine; escolha nomes claros para o consumidor final
+5. **Não confunda com variações** — características são informativas; para opções que geram SKUs diferentes (estoque separado), use variações
+
+## Como Usar no Claude Code
+
+### Exemplos de Prompt
+
+- "adiciona as características Cor, Material e Voltagem ao produto 123"
+- "como padronizo características reutilizáveis entre vários produtos?"
+- "cria características globais de Material e depois vincula ao produto"
+- "lista todas as características do produto 456"
+
+### O que o Claude faz
+
+1. Distingue características globais (reutilizáveis) de características por produto
+2. Gera código de criação global via `POST /properties` quando a padronização é necessária
+3. Gera código de vínculo com o produto via `POST /products/:id/properties`
+4. Inclui o wrapper `Property` correto em cada chamada
+
+### O que você recebe
+
+- Código do fluxo: criar global → vincular ao produto (quando aplicável)
+- Código de adição direta de característica a um produto específico
+- Exemplos com múltiplas características em sequência
+- Consulta de características existentes via `GET /products/:id/properties`
+
+### Pré-requisitos
+
+- Produto já cadastrado com `product_id` disponível
+- `access_token` configurado

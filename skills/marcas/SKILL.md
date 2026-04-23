@@ -5,6 +5,9 @@ description: >
   as marcas (fabricantes) dos produtos da loja, incluindo listagem, consulta individual,
   criação, atualização e exclusão. Inclui campos de nome, slug, descrição e imagem
   da marca, além de paginação e filtros.
+when_to_use: >
+  Use quando o desenvolvedor mencionar: marca, fabricante, brand, GET /brands,
+  POST /brands, PUT /brands, brand_id, filtrar por marca ou cadastrar fabricante.
 ---
 
 # API de Marcas — Tray

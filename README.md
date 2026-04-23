@@ -45,13 +45,27 @@ claude --plugin-dir ./tray-api-claude-plugin
 
 ## Agentes
 
+### Principais
+
 | Agente | Descrição |
 |:--|:--|
 | `/tray-api:configuracao-aplicativo` | Guia de setup inicial e configuração OAuth |
 | `/tray-api:gestor-catalogo` | Gestão em massa de catálogo (produtos, categorias, variações) |
 | `/tray-api:gestor-pedidos` | Ciclo completo de pedidos (criação, status, fulfillment) |
 | `/tray-api:debug-integracao` | Diagnóstico de problemas e erros de API |
-| `/tray-api:assistente-migracao` | Migração de outras plataformas (Shopify, WooCommerce, Magento, VTEX, Nuvemshop) |
+| `/tray-api:assistente-migracao` | Orquestra migração de outras plataformas; ativa o subagente da plataforma de origem |
+
+### Subagentes de Migração
+
+Ativados automaticamente pelo `assistente-migracao`. Consulte [agents/AGENTES.md](agents/AGENTES.md) para guia completo de escolha de agente.
+
+| Subagente | Plataforma de Origem |
+|:--|:--|
+| `agents/migracao/shopify.md` | Shopify |
+| `agents/migracao/woocommerce.md` | WooCommerce |
+| `agents/migracao/magento.md` | Magento 2 |
+| `agents/migracao/vtex.md` | VTEX |
+| `agents/migracao/nuvemshop.md` | Nuvemshop |
 
 ## Comandos
 
@@ -142,12 +156,6 @@ claude --plugin-dir ./tray-api-claude-plugin
 > /tray-api:validar-integracao
 # Valida se sua integração está pronta para homologação
 ```
-
-## Planejamento
-
-Roadmap, trilhas de produto (hub de skills, confiabilidade, documentação para público misto) e checklist de smoke test: veja [docs/PLANEJAMENTO.md](docs/PLANEJAMENTO.md).
-
-Referências de **frontend / design system Tray** (paleta, tema, componentes) para evoluções como landing: [frontRefs/README.md](frontRefs/README.md).
 
 ## Contribuindo
 

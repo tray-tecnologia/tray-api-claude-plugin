@@ -4,6 +4,9 @@ description: >
   API de Parceiros da Tray. Utilize quando o desenvolvedor precisar
   gerenciar parceiros/revendedores da loja, incluindo listagem, consulta,
   cadastro, atualização e exclusão.
+when_to_use: >
+  Use quando o desenvolvedor mencionar: parceiro, revendedor, partner, GET /partners,
+  POST /partners, cadastrar parceiro, canal de vendas parceiro ou comissão de parceiro.
 ---
 
 # API de Parceiros — Tray

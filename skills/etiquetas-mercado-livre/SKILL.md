@@ -4,6 +4,9 @@ description: >
   API de Etiquetas do Mercado Livre da Tray. Utilize quando o desenvolvedor
   precisar consultar etiquetas de envio geradas pelo Mercado Livre para pedidos
   originados neste marketplace.
+when_to_use: >
+  Use quando o desenvolvedor mencionar: etiqueta Mercado Livre, ML label, etiqueta ML,
+  GET /orders/:id/labels/mercadolivre, pedido Mercado Livre, envio ML ou rastreio Mercado Livre.
 ---
 
 # API de Etiquetas do Mercado Livre — Tray

@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.1.0] - 2026-04-23
+
+### Adicionado
+
+#### Suporte nativo a múltiplas ferramentas de IA
+
+- `AGENTS.md` — carregado automaticamente por Cursor, OpenAI Codex, Windsurf e JetBrains AI; índice completo de skills e agentes com regras da API Tray
+- `GEMINI.md` — carregado automaticamente pelo Gemini CLI; importa os skills principais via `@` e lista os demais
+- `.cursor/rules/tray-api.mdc` — regra Cursor com frontmatter (`description`, `alwaysApply`) e referências `@` a todos os 34 skills e agentes
+- `.github/copilot-instructions.md` — instrução de repositório para GitHub Copilot (VS Code)
+- `.aiassistant/rules/tray-api.md` — project rule para JetBrains AI Assistant
+
+#### Skills (34 — campo `when_to_use` adicionado a todos)
+
+Todos os 34 skills agora possuem o campo `when_to_use` no frontmatter, garantindo
+descoberta automática confiável em Codex e Gemini CLI.
+
+### Alterado
+
+- `README.md` — nova seção "Instalação por ferramenta" cobrindo todas as 7 ferramentas suportadas
+
+---
+
 ## [1.0.0] - 2026-03-21
 
 ### Adicionado

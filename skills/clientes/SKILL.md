@@ -5,6 +5,10 @@ description: >
   gerenciar dados de clientes da loja: listagem, consulta, cadastro, atualização
   e exclusão. Inclui campos de pessoa física (CPF) e jurídica (CNPJ), validações
   brasileiras e gestão de newsletter.
+when_to_use: >
+  Use quando o desenvolvedor mencionar: cliente, cadastrar cliente, atualizar
+  cliente, CPF, CNPJ, pessoa física, pessoa jurídica, GET /customers, POST /customers,
+  PUT /customers, endereço de cliente, validação de CPF, validação de CNPJ ou opt-in newsletter.
 ---
 
 # API de Clientes — Tray

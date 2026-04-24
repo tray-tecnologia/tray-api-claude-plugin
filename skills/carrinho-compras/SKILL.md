@@ -4,6 +4,10 @@ description: >
   API de carrinho de compras da Tray.
   Permite criar, consultar, atualizar e excluir carrinhos,
   incluindo suporte a kits de produtos. Contém 6 endpoints.
+when_to_use: >
+  Use quando o desenvolvedor mencionar: carrinho, cart, adicionar ao carrinho,
+  GET /carts, POST /carts, PUT /carts, remover do carrinho, carrinho abandonado,
+  carrinho de compras ou checkout.
 ---
 
 # Carrinho de Compras

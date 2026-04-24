@@ -6,6 +6,10 @@ description: >
   criação, atualização e exclusão de formas de envio e suas respectivas tabelas de
   CEP com faixas de peso, preços e prazos. Essencial para configurar regras de frete
   personalizadas por região e faixa de peso.
+when_to_use: >
+  Use quando o desenvolvedor mencionar: configurar frete, método de envio, tabela de frete,
+  faixa de CEP, faixa de peso, prazo de entrega, POST /freights_settings,
+  forma de envio personalizada, frete por região ou frete customizado.
 ---
 
 # API de Configuração de Frete — Tray

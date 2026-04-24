@@ -5,6 +5,10 @@ description: >
   gerenciar a árvore de categorias da loja, incluindo consulta hierárquica,
   criação de subcategorias, reordenação e exclusão. Inclui consulta de árvore
   completa e dados individuais por ID.
+when_to_use: >
+  Use quando o desenvolvedor mencionar: categoria, subcategoria, árvore de categorias,
+  GET /categories, POST /categories, hierarquia de categorias, reordenar categoria,
+  category_id, departamento ou seção da loja.
 ---
 
 # API de Categorias — Tray

@@ -1,5 +1,24 @@
 # Changelog
 
+## [Unreleased]
+
+### Adicionado
+
+- `package.json` na raiz para distribuição como pacote Node instalável
+- `.cursor-plugin/plugin.json` para manifesto nativo de distribuição no Cursor
+- `.codex-plugin/plugin.json` para manifesto nativo de distribuição no Codex
+- `gemini-extension.json` para extensão nativa no Gemini CLI
+- `scripts/sync-version.js` para sincronizar e validar versão entre todos os manifests
+
+### Alterado
+
+- `.claude-plugin/plugin.json` e `.claude-plugin/marketplace.json` alinhados para versão `1.1.0`
+- `README.md` com fluxo de instalação via `npm`/`pnpm`/`bun` e instruções por ferramenta usando `node_modules`
+- `scripts/smoke-test.js` para validar também os novos manifests de distribuição
+- `package.json` com scripts `version:check` e `version:set`
+
+---
+
 ## [1.1.0] - 2026-04-23
 
 ### Adicionado

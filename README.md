@@ -14,6 +14,21 @@ Funciona nativamente com **Claude Code**, **Cursor**, **OpenAI Codex**, **Google
 
 ## Instalação por ferramenta
 
+### Instalação via pacote Node (recomendado para projetos locais)
+
+Adicione o plugin como dependência de desenvolvimento no seu repositório:
+
+```bash
+npm install --save-dev github:tray-tecnologia/tray-api-claude-plugin
+# ou
+pnpm add -D github:tray-tecnologia/tray-api-claude-plugin
+# ou
+bun add -d github:tray-tecnologia/tray-api-claude-plugin
+```
+
+O pacote será instalado em `node_modules/@tray-tecnologia/tray-api-plugin/` e pode
+ser referenciado pelas ferramentas que suportam contexto por arquivos locais.
+
 ### Claude Code (instalação nativa via plugin)
 
 ```bash
@@ -28,7 +43,13 @@ claude --plugin-dir ./tray-api-claude-plugin
 
 ### Cursor
 
-Clone ou adicione como submódulo no seu projeto de integração. O arquivo `.cursor/rules/tray-api.mdc` é carregado automaticamente quando o Cursor abre o repositório.
+Opção 1 (recomendada): instalar via pacote Node e apontar o rule file para o projeto.
+
+```bash
+cp node_modules/@tray-tecnologia/tray-api-plugin/.cursor/rules/tray-api.mdc .cursor/rules/tray-api.mdc
+```
+
+Opção 2: clone ou submódulo no projeto de integração. O arquivo `.cursor/rules/tray-api.mdc` é carregado automaticamente quando o Cursor abre o repositório.
 
 ```bash
 git submodule add https://github.com/tray-tecnologia/tray-api-claude-plugin.git .tray-plugin
@@ -38,7 +59,13 @@ O Cursor passa a ter acesso a todos os skills via `@skills/` e aos agentes via `
 
 ### OpenAI Codex CLI
 
-Clone ou adicione como submódulo. O `AGENTS.md` na raiz é carregado automaticamente pelo Codex.
+Opção 1 (recomendada): usar o pacote instalado e importar o `AGENTS.md` no contexto do seu projeto.
+
+```bash
+cp node_modules/@tray-tecnologia/tray-api-plugin/AGENTS.md ./
+```
+
+Opção 2: clone ou submódulo. O `AGENTS.md` na raiz é carregado automaticamente pelo Codex.
 
 ```bash
 git submodule add https://github.com/tray-tecnologia/tray-api-claude-plugin.git .tray-plugin
@@ -46,7 +73,13 @@ git submodule add https://github.com/tray-tecnologia/tray-api-claude-plugin.git 
 
 ### Google Gemini CLI
 
-Clone ou adicione como submódulo. O `GEMINI.md` na raiz é carregado automaticamente via sistema hierárquico de contexto.
+Opção 1 (recomendada): usar o pacote instalado e copiar o contexto `GEMINI.md`.
+
+```bash
+cp node_modules/@tray-tecnologia/tray-api-plugin/GEMINI.md ./
+```
+
+Opção 2: clone ou submódulo. O `GEMINI.md` na raiz é carregado automaticamente via sistema hierárquico de contexto.
 
 ```bash
 git submodule add https://github.com/tray-tecnologia/tray-api-claude-plugin.git .tray-plugin

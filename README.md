@@ -14,7 +14,7 @@ Funciona nativamente com **Claude Code**, **Cursor**, **OpenAI Codex**, **Google
 
 - Credenciais de API Tray (Consumer Key e Consumer Secret) — obtidas em [developers.tray.com.br](https://developers.tray.com.br/#criando-seu-aplicativo)
 
-## Instalação por ferramenta
+## Instalação por ferramenta através do CLI
 
 ### Instalação via pacote Node (recomendado para projetos locais)
 

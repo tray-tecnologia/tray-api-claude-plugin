@@ -51,6 +51,14 @@ Documentação oficial: https://developers.tray.com.br/#apis-de-newsletter
 }
 ```
 
+| Campo | Tipo | Obrigatório | Descrição |
+|:--|:--|:--|:--|
+| `email` | string | **Sim** | E-mail do assinante (único). Sem ele → HTTP 400. |
+| `name` | string | Não | Nome do assinante |
+
+> ⚠️ **`email` é obrigatório** na inscrição. A confirmação (double opt-in)
+> aceita `email` **ou** `token` no corpo.
+
 ## Fluxo de Inscrição
 
 1. `POST /newsletters` — cadastra o e-mail

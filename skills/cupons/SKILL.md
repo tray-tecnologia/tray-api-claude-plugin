@@ -155,7 +155,7 @@ O body usa `Content-Type: application/x-www-form-urlencoded` com o wrapper `["Di
 | Campo | Tipo | Obrigatório | Descrição |
 |:--|:--|:--|:--|
 | `code` | string | Sim | Código do cupom — sem espaços nem acentos |
-| `description` | string | Não | Descrição do cupom |
+| `description` | string | **Sim** | Descrição do cupom (obrigatória na criação) |
 | `coupon_type` | string | Não | Tipo: `loja`, `cliente`, `troca`, `presente` |
 | `starts_at` | date | Não | Início da validade (`YYYY-MM-DD`) |
 | `ends_at` | date | Não | Fim da validade (`YYYY-MM-DD`) |
@@ -168,6 +168,9 @@ O body usa `Content-Type: application/x-www-form-urlencoded` com o wrapper `["Di
 | `usage_counter_limit_customer` | integer | Não | Limite de usos por cliente |
 | `cumulative_discount` | number | Não | `1` = acumula com desconto progressivo |
 
+> ⚠️ **Obrigatórios na criação (`POST`):** `code`, `description`, `value` e
+> `type`. Omitir qualquer um resulta em HTTP 400.
+>
 > **Campos `local_application`:** `loja`, `produtos`, `marcas`, `categorias`
 > **Campos `freight_application`:** `nao_aplicavel`, `desconto`, `frete_gratis`
 

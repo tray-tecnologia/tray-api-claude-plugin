@@ -3,7 +3,7 @@
   "title": "Customer",
   "description": "Payload para POST/PUT /customers na API Tray",
   "type": "object",
-  "required": ["name", "email"],
+  "required": ["name", "email", "birth_date"],
   "properties": {
     "name": {
       "type": "string",
@@ -37,7 +37,7 @@
     },
     "birth_date": {
       "type": "string",
-      "description": "Data de nascimento no formato YYYY-MM-DD"
+      "description": "Data de nascimento (YYYY-MM-DD). OBRIGATÓRIO na criação (POST)."
     },
     "gender": {
       "type": "string",

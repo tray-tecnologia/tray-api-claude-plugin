@@ -14,10 +14,10 @@ Saneamento de conformidade das skills confrontando o comportamento real da API T
 ### Corrigido
 
 - **Variações — formato de atributos** (`skills/variacoes`): a skill documentava `values: [{name, value}]`, formato inexistente na API. A API usa campos planos `type_1`/`value_1` e `type_2`/`value_2` (`type_1`/`value_1` obrigatórios na criação; no máximo 2 eixos). Reescrita a tabela de campos, exemplos e regra de múltiplas variações
-- **Marcas — campo do nome** (`skills/marcas`): a skill usava `name`, mas a API exige `brand` (`a API` `beforeSave` falha sem ele); `name` era ignorado, causando `"Invalid data provided"` (HTTP 400). Corrigido para `brand`; removidos campos inexistentes `description`/`image`; filtros e exemplos de resposta ajustados
-- **Clientes — `birth_date` obrigatório** (`skills/clientes`): `a API` exige `birth_date` na criação (`required=true, on=create`); a skill marcava como opcional. Adicionado a `required` no schema, tabela, exemplo e alerta
-- **Cupons — campos obrigatórios** (`skills/cupons`): `a API` exige `code`, `description`, `value` e `type` na criação; `description` estava como opcional. Documentados os quatro obrigatórios
-- **Newsletter — `email` obrigatório** (`skills/newsletter`): `a API` (`notEmptyFields=['email']`); documentada a obrigatoriedade e tabela de campos
+- **Marcas — campo do nome** (`skills/marcas`): a skill usava `name`, mas a API exige `brand`; `name` era ignorado, causando `"Invalid data provided"` (HTTP 400). Corrigido para `brand`; removidos campos inexistentes `description`/`image`; filtros e exemplos de resposta ajustados
+- **Clientes — `birth_date` obrigatório** (`skills/clientes`): a API exige `birth_date` na criação; a skill marcava como opcional. Adicionado a `required` no schema, tabela, exemplo e alerta
+- **Cupons — campos obrigatórios** (`skills/cupons`): a API exige `code`, `description`, `value` e `type` na criação; `description` estava como opcional. Documentados os quatro obrigatórios
+- **Newsletter — `email` obrigatório** (`skills/newsletter`): a API exige `email` na inscrição; documentada a obrigatoriedade e tabela de campos
 - **Endereços de cliente — rota incorreta** (`skills/enderecos-cliente`): a rota documentada `/customers/:id/addresses` retorna HTTP 404; a correta é `/customers/addresses` e `/customers/addresses/:id` (`customer_id` na query/corpo, não no path). Endpoints corrigidos, método `PUT` adicionado
 
 ### Adicionado

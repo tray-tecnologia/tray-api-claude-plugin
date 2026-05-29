@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Variant",
+  "description": "Payload para POST/PUT /variants na API Tray",
+  "type": "object",
+  "required": ["product_id", "type_1", "value_1"],
+  "properties": {
+    "product_id": {
+      "type": ["string", "number"],
+      "description": "ID do produto pai"
+    },
+    "type_1": {
+      "type": "string",
+      "description": "Nome do 1º atributo (ex: Cor). Obrigatório no create."
+    },
+    "value_1": {
+      "type": "string",
+      "description": "Valor do 1º atributo (ex: Azul). Obrigatório no create."
+    },
+    "type_2": {
+      "type": "string",
+      "description": "Nome do 2º atributo (ex: Tamanho). Obrigatório se value_2 presente."
+    },
+    "value_2": {
+      "type": "string",
+      "description": "Valor do 2º atributo (ex: M). Obrigatório se type_2 presente."
+    },
+    "price": {
+      "type": ["string", "number"],
+      "description": "Preço de venda. Herda do produto pai se omitido."
+    },
+    "cost_price": {
+      "type": ["string", "number"],
+      "description": "Preço de custo"
+    },
+    "promotional_price": {
+      "type": ["string", "number"],
+      "description": "Preço promocional"
+    },
+    "start_promotion": {
+      "type": "string",
+      "description": "Início da promoção (YYYY-MM-DD)"
+    },
+    "end_promotion": {
+      "type": "string",
+      "description": "Fim da promoção (YYYY-MM-DD)"
+    },
+    "stock": {
+      "type": ["string", "number"],
+      "description": "Estoque da variação"
+    },
+    "minimum_stock": {
+      "type": ["string", "number"],
+      "description": "Estoque mínimo"
+    },
+    "ean": {
+      "type": "string",
+      "description": "Código de barras EAN da variação"
+    },
+    "reference": {
+      "type": "string",
+      "description": "Referência interna da variação"
+    },
+    "weight": {
+      "type": ["string", "number"],
+      "description": "Peso em gramas. Herda do produto pai se omitido."
+    },
+    "length": {
+      "type": ["string", "number"],
+      "description": "Comprimento. Herda do produto pai se omitido."
+    },
+    "width": {
+      "type": ["string", "number"],
+      "description": "Largura. Herda do produto pai se omitido."
+    },
+    "height": {
+      "type": ["string", "number"],
+      "description": "Altura. Herda do produto pai se omitido."
+    },
+    "cubic_weight": {
+      "type": ["string", "number"],
+      "description": "Peso cúbico"
+    },
+    "availability": {
+      "type": "string",
+      "description": "Texto de disponibilidade"
+    },
+    "availability_days": {
+      "type": ["string", "number"],
+      "description": "Dias até disponível"
+    }
+  },
+  "additionalProperties": false
+}

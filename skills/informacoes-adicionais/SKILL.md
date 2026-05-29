@@ -13,6 +13,10 @@ when_not_to_use: >
   variações com estoque separado (use tray-variacoes).
 ---
 
+## MANDATORY: Tool Call(s) Required Before Answering
+
+- **OBRIGATÓRIO:** `node skills/tray-dev/scripts/search_docs.mjs "<termo>"` — confirme o comportamento da API antes de gerar código.
+
 ## Antes de responder
 
 > Execute estas verificações antes de gerar qualquer payload ou código:

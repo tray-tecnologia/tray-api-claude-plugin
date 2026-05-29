@@ -9,7 +9,7 @@
 
 ## [1.3.0] - 2026-05-29
 
-Saneamento de conformidade das skills confrontando o código-fonte da API (`código-fonte oficial da API Tray`) e a documentação oficial. Corrige bugs que bloqueavam a criação de recursos via API.
+Saneamento de conformidade das skills confrontando o comportamento real da API Tray e a documentação oficial. Corrige bugs que bloqueavam a criação de recursos via API.
 
 ### Corrigido
 

@@ -7,8 +7,8 @@ description: >
   com campos completos do padrão brasileiro (CEP, bairro, cidade, estado, complemento).
 when_to_use: >
   Use quando o desenvolvedor mencionar: endereço de cliente, endereço de entrega,
-  endereço de cobrança, CEP, customer address, GET /customers/:id/addresses,
-  POST /customers/:id/addresses, bairro, cidade, estado ou complemento de endereço.
+  endereço de cobrança, CEP, customer address, GET /customers/addresses,
+  POST /customers/addresses, bairro, cidade, estado ou complemento de endereço.
 when_not_to_use: >
   Não use para dados cadastrais do cliente (use tray-clientes) nem para perfis de
   segmentação (use tray-perfis-cliente).
@@ -35,19 +35,25 @@ Documentação oficial: https://developers.tray.com.br/#api-de-clientes
 
 | Método | Endpoint | Descrição |
 |:--|:--|:--|
-| GET | `/customers/:customer_id/addresses` | Listar endereços de um cliente |
-| GET | `/customers/:customer_id/addresses/:id` | Consultar endereço específico por ID |
-| POST | `/customers/:customer_id/addresses` | Cadastrar novo endereço para o cliente |
-| DELETE | `/customers/:customer_id/addresses/:id` | Excluir endereço do cliente |
+| GET | `/customers/addresses` | Listar endereços (filtre por `customer_id` na query) |
+| GET | `/customers/addresses/:id` | Consultar endereço específico por ID |
+| POST | `/customers/addresses` | Cadastrar novo endereço (`customer_id` vai no corpo) |
+| PUT | `/customers/addresses/:id` | Atualizar endereço |
+| DELETE | `/customers/addresses/:id` | Excluir endereço |
 
 **Autenticação:** `?access_token={token}` em todas as chamadas.
+
+> ⚠️ **Rota correta é `/customers/addresses` (e `/customers/addresses/:id`),
+> NÃO `/customers/:id/addresses`.** O caminho com o id do cliente no meio
+> retorna HTTP 404. O `customer_id` vai na **query** (listagem/filtro) ou no
+> **corpo** (criação), nunca no path.
 
 ## Campos do Endereço
 
 | Campo | Tipo | Obrigatório | Descrição |
 |:--|:--|:--|:--|
 | `id` | number | — | ID do endereço (retornado pela API) |
-| `customer_id` | number | — | ID do cliente (definido na URL) |
+| `customer_id` | number | Sim | ID do cliente (no corpo na criação; na query na listagem) |
 | `recipient` | string | Sim | Nome do destinatário |
 | `street` | string | Sim | Nome da rua/logradouro |
 | `number` | string | Sim | Número do endereço |

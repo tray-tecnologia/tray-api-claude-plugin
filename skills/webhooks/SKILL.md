@@ -14,6 +14,11 @@ when_not_to_use: >
   Para ativar escopos além de order, abra chamado no suporte Tray.
 ---
 
+## MANDATORY: Tool Call(s) Required Before Answering
+
+- **OBRIGATÓRIO:** `node skills/tray-dev/scripts/search_docs.mjs "<termo>"` — confirme o comportamento da API antes de gerar código.
+- **OBRIGATÓRIO:** `node skills/webhooks/scripts/validate.mjs '<payload_json>'` — valide a estrutura do payload antes de retornar código ao usuário.
+
 ## Antes de responder
 
 > Execute estas verificações antes de gerar qualquer payload ou código:

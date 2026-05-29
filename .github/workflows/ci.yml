@@ -29,8 +29,14 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Lint de skills (bloco MANDATORY + schemas categoria A)
+        run: npm run lint:skills
+
       - name: Validar JSON, frontmatter e payloads das skills
         run: npm run smoke
+
+      - name: Testes unitários (mcp/lib)
+        run: npm test
 
       - name: Validar consistência de versão entre manifests
         run: npm run version:check

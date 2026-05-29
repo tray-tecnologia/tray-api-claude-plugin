@@ -43,7 +43,9 @@
     "gemini-extension.json"
   ],
   "scripts": {
+    "lint:skills": "node scripts/lint-skills.mjs",
     "smoke": "node scripts/smoke-test.js",
+    "test": "node --test tests/mcp/load-schemas.test.mjs",
     "version:check": "node scripts/sync-version.js --check",
     "version:set": "node scripts/sync-version.js"
   }

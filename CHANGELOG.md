@@ -7,6 +7,31 @@
 - **Licença migrada de GPL-3.0 para MIT.** Aplica-se a versões futuras; cópias previamente distribuídas mantêm os termos GPL-3.0 originais. Atualizados `LICENSE`, badge e seções de licença em `README.md`, `CONTRIBUTING.md` e o campo `license` em `package.json`, `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `.cursor-plugin/plugin.json` e `.codex-plugin/plugin.json`. Decisão alinhada com o padrão permissivo adotado por toolkits de IA de referência (ex.: Shopify/Shopify-AI-Toolkit)
 - **Repositório renomeado de `tray-api-claude-plugin` para `tray-api-ai-plugin`** para refletir compatibilidade multi-plataforma (Claude Code, Cursor, Codex, Gemini CLI, GitHub Copilot, JetBrains AI, Windsurf). Comandos de instalação atualizados em `README.md`, `CONTRIBUTING.md` e `SECURITY.md`. Campo `repository` atualizado nos cinco manifests de plugin. Nome do pacote npm (`@tray-tecnologia/tray-api-plugin`) e ID do plugin (`tray-api`) **não foram alterados**, preservando comandos como `npm install @tray-tecnologia/tray-api-plugin` e `/plugin install tray-api@tray-plugins`. `scripts/cleanup-plugin-installations.sh` reconhece ambos os nomes durante a transição. URLs antigas continuam funcionando via redirect permanente do GitHub
 
+## [1.3.0] - 2026-05-29
+
+Saneamento de conformidade das skills confrontando o código-fonte da API (`commerce/api_php8`) e a documentação oficial. Corrige bugs que bloqueavam a criação de recursos via API.
+
+### Corrigido
+
+- **Variações — formato de atributos** (`skills/variacoes`): a skill documentava `values: [{name, value}]`, formato inexistente na API. A API usa campos planos `type_1`/`value_1` e `type_2`/`value_2` (`type_1`/`value_1` obrigatórios na criação; no máximo 2 eixos). Reescrita a tabela de campos, exemplos e regra de múltiplas variações
+- **Marcas — campo do nome** (`skills/marcas`): a skill usava `name`, mas a API exige `brand` (`Brand.php` `beforeSave` falha sem ele); `name` era ignorado, causando `"Invalid data provided"` (HTTP 400). Corrigido para `brand`; removidos campos inexistentes `description`/`image`; filtros e exemplos de resposta ajustados
+- **Clientes — `birth_date` obrigatório** (`skills/clientes`): `Customer.php` exige `birth_date` na criação (`required=true, on=create`); a skill marcava como opcional. Adicionado a `required` no schema, tabela, exemplo e alerta
+- **Cupons — campos obrigatórios** (`skills/cupons`): `DiscountCoupon.php` exige `code`, `description`, `value` e `type` na criação; `description` estava como opcional. Documentados os quatro obrigatórios
+- **Newsletter — `email` obrigatório** (`skills/newsletter`): `Newsletter.php` (`notEmptyFields=['email']`); documentada a obrigatoriedade e tabela de campos
+- **Endereços de cliente — rota incorreta** (`skills/enderecos-cliente`): a rota documentada `/customers/:id/addresses` retorna HTTP 404; a correta é `/customers/addresses` e `/customers/addresses/:id` (`customer_id` na query/corpo, não no path). Endpoints corrigidos, método `PUT` adicionado
+
+### Adicionado
+
+- `skills/{variacoes,categorias,marcas}/scripts/validate.mjs` + `assets/schema.json` — validadores executáveis de payload, completando as 8 skills de categoria A previstas no CLAUDE.md (`additionalProperties:false` para rejeitar campos inexistentes)
+- `scripts/lint-skills.mjs` + `npm run lint:skills` — lint que exige o bloco `## MANDATORY: Tool Call(s)...` imediatamente após o frontmatter em toda skill, chamada a `search_docs.mjs` e, nas skills de categoria A, chamada a `validate.mjs` + existência de `validate.mjs`/`schema.json` válidos
+- Bloco `## MANDATORY: Tool Call(s) Required Before Answering` em todas as 35 skills (33 que não o possuíam)
+- `npm test` (`node --test`) cobrindo `tests/mcp/load-schemas.test.mjs`
+
+### Alterado
+
+- `.github/workflows/ci.yml` — executa `lint:skills` antes do `smoke` e roda `npm test` (matriz Node 20 e 22), conforme o CLAUDE.md
+- `scripts/smoke-test.js` — cobre os validadores de `variacoes`, `categorias` e `marcas` (payload válido + rejeição do payload incorreto)
+
 ## [1.2.0] - 2026-04-29
 
 ### Adicionado

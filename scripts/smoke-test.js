@@ -231,6 +231,7 @@ const validPayloads = [
   { skill: 'autorizacao', payload: '{"consumer_key":"abc","consumer_secret":"xyz","code":"123"}' },
   { skill: 'webhooks',    payload: '{"seller_id":100,"scope_id":200,"scope_name":"order","act":"insert"}' },
   { skill: 'clientes',    payload: '{"name":"João Silva","email":"joao@exemplo.com"}' },
+  { skill: 'variacoes',   payload: '{"product_id":1,"type_1":"Cor","value_1":"Azul"}' },
 ];
 
 for (const { skill, payload } of validPayloads) {
@@ -253,6 +254,7 @@ const invalidPayloads = [
   { skill: 'autorizacao', payload: '{"consumer_key":"abc"}',         expect: 'consumer_secret e code ausentes' },
   { skill: 'webhooks',    payload: '{"seller_id":100}',              expect: 'scope_id/scope_name/act ausentes' },
   { skill: 'clientes',    payload: '{"cpf":"12345678901"}',          expect: 'name e email ausentes' },
+  { skill: 'variacoes',   payload: '{"Variant":{"product_id":1,"values":[{"name":"Cor","value":"Azul"}]}}', expect: 'campo values inexistente / type_1 e value_1 ausentes' },
 ];
 
 for (const { skill, payload, expect } of invalidPayloads) {

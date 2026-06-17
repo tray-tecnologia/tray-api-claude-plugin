@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Payment",
+  "description": "Payload de atualização parcial de pagamento via PUT /payments/:id. Body envolto na chave de recurso Payment. Doc: https://developers.tray.com.br/#apis-de-informacoes-de-pagamento",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "processing",
+        "approved",
+        "refused",
+        "refunded",
+        "cancelled",
+        "chargeback"
+      ],
+      "description": "Novo status do pagamento (ex.: sincronizar pending -> approved com o gateway)."
+    },
+    "transaction_id": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "ID da transação no gateway; chave de conciliação Tray <-> gateway."
+    },
+    "paid_at": {
+      "type": "string",
+      "format": "datetime",
+      "description": "Data/hora da confirmação do pagamento. YYYY-MM-DD HH:MM:SS (horário de Brasília, sem timezone)."
+    },
+    "amount": {
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]{1,2})?$",
+      "description": "Valor do pagamento. Decimal com ponto, ex.: '299.90'. Nunca usar vírgula ou separador de milhar."
+    },
+    "installments": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Número de parcelas (cartão de crédito). Deve respeitar max_installments de /payments/settings."
+    },
+    "card_brand": {
+      "type": "string",
+      "maxLength": 60,
+      "description": "Bandeira do cartão (ex.: Visa, Mastercard, Elo)."
+    },
+    "card_last_digits": {
+      "type": "string",
+      "pattern": "^[0-9]{4}$",
+      "description": "Últimos 4 dígitos do cartão. NUNCA armazenar o número completo (PCI-DSS)."
+    }
+  },
+  "additionalProperties": false
+}

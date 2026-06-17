@@ -30,20 +30,21 @@ export const VALIDATE_SKILLS = [
  * Skills aprofundadas (issue ai/tasks#100, P2.1). Têm piso de densidade:
  * SKILL.md deve ter pelo menos MIN_DENSE_LINES linhas (regra R7).
  *
- * A lista cresce conforme cada skill é reescrita no template denso, para
- * manter o lint verde de forma incremental:
- *   Fase 1 (atual): cupons (piloto).
- *   Fase 2 (pendente): multicd, pagamentos, frete, status-pedido.
+ * A lista cresceu conforme cada skill foi reescrita no template denso:
+ *   Fase 1: cupons (piloto).
+ *   Fase 2: multicd, pagamentos, frete, status-pedido.
+ * Todas as 5 skills priorizadas da #100 já atingiram o piso.
  */
-export const DENSE_SKILLS = ['cupons'];
-
-/** Skills da #100 ainda na fila de aprofundamento (entram em DENSE_SKILLS ao atingir o piso). */
-export const PENDING_DENSE_SKILLS = [
+export const DENSE_SKILLS = [
+  'cupons',
   'multicd',
   'pagamentos',
   'frete',
   'status-pedido',
 ];
+
+/** Skills da #100 ainda na fila de aprofundamento (entram em DENSE_SKILLS ao atingir o piso). */
+export const PENDING_DENSE_SKILLS = [];
 
 export const MIN_DENSE_LINES = 800;
 

@@ -1,0 +1,10 @@
+{
+  "Product": {
+    "name": "Camiseta Exemplo",
+    "price": 49.90,
+    "stock": 10,
+    "category_id": 1,
+    "available": 1,
+    "description": "Produto de teste — fixture do exemplo do plugin"
+  }
+}

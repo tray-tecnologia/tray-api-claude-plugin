@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.1.0] - 2026-06-17
+
+### Adicionado
+
+- `docs/skill-template.md` — template de SKILL.md denso (endpoints com exemplos curl+Node, edge cases, antipadrões, state machine, glossário) usado para aprofundar skills estratégicas (issue #100, P2.1).
+- Regra **R7** no linter (`scripts/lint-skills.mjs`): skills em `DENSE_SKILLS` exigem SKILL.md com no mínimo 800 linhas. +5 testes.
+- Schemas embarcados em `schemas/` para 5 recursos: `cupons` (discount_coupons.create/update), `multicd` (distribution_center.create/update), `pagamentos` (payment.create/update), `frete` (shippings.cotation), `status-pedido` (order_status.update).
+
+### Mudado
+
+- 5 skills aprofundadas para densidade comparável ao benchmark Shopify (todas > 800 linhas): `cupons` (332→1006), `multicd` (287→833), `pagamentos` (290→823), `frete` (189→897), `status-pedido` (179→920).
+- State machines em mermaid adicionadas a `status-pedido` e `pagamentos`.
+
+### Notas
+
+- Exemplos curl/Node das skills aprofundadas estão marcados `NÃO-VERIFICADO contra sandbox` — devem ser executados contra a sandbox Tray antes do release final (critério de aceite da issue #100).
+
 ## [2.0.0] - 2026-05-05
 
 ### Adicionado

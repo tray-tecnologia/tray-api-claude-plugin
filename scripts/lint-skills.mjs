@@ -26,6 +26,28 @@ export const VALIDATE_SKILLS = [
   'marcas',
 ];
 
+/**
+ * Skills aprofundadas (issue ai/tasks#100, P2.1). Têm piso de densidade:
+ * SKILL.md deve ter pelo menos MIN_DENSE_LINES linhas (regra R7).
+ *
+ * A lista cresceu conforme cada skill foi reescrita no template denso:
+ *   Fase 1: cupons (piloto).
+ *   Fase 2: multicd, pagamentos, frete, status-pedido.
+ * Todas as 5 skills priorizadas da #100 já atingiram o piso.
+ */
+export const DENSE_SKILLS = [
+  'cupons',
+  'multicd',
+  'pagamentos',
+  'frete',
+  'status-pedido',
+];
+
+/** Skills da #100 ainda na fila de aprofundamento (entram em DENSE_SKILLS ao atingir o piso). */
+export const PENDING_DENSE_SKILLS = [];
+
+export const MIN_DENSE_LINES = 800;
+
 const R1_HEADER =
   /^## MANDATORY: Tool Calls? Required Before Answering$/gm;
 const R1_HEADER_SINGLE =
@@ -138,6 +160,16 @@ export function lintSkill(resourceName, content) {
       message:
         'O conteúdo deve conter a substring "OBRIGATÓRIA" (maiúsculas, com acento).',
     });
+  }
+
+  if (DENSE_SKILLS.includes(resourceName)) {
+    const lineCount = content.split('\n').length;
+    if (lineCount < MIN_DENSE_LINES) {
+      errors.push({
+        rule: 'R7',
+        message: `Skill aprofundada (issue #100): SKILL.md deve ter ≥ ${MIN_DENSE_LINES} linhas; encontrado ${lineCount}.`,
+      });
+    }
   }
 
   return errors;

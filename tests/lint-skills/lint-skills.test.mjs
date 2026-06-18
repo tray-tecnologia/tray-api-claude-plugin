@@ -9,6 +9,9 @@ import {
   lintSkill,
   findSkillFiles,
   SKIP_SKILLS,
+  DENSE_SKILLS,
+  PENDING_DENSE_SKILLS,
+  MIN_DENSE_LINES,
 } from '../../scripts/lint-skills.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -19,8 +22,9 @@ test('lintSkill: valid-a.md + produtos → sem erros', () => {
   assert.deepEqual(errors, []);
 });
 
-test('lintSkill: valid-b.md + cupons → sem erros', () => {
-  const errors = lintSkill('cupons', fx('valid-b.md'));
+test('lintSkill: valid-b.md + kits → sem erros (skill leve, sem piso de densidade)', () => {
+  // kits não é VALIDATE_SKILLS nem DENSE_SKILLS → só checagem estrutural.
+  const errors = lintSkill('kits', fx('valid-b.md'));
   assert.deepEqual(errors, []);
 });
 
@@ -73,4 +77,39 @@ test('findSkillFiles: temp dir com 3 skills → 3 paths absolutos', () => {
   }
   const basenames = paths.map((p) => basename(dirname(p))).sort();
   assert.deepEqual(basenames, ['outra', 'produtos', 'tray-dev']);
+});
+
+/* ─── R7: densidade mínima de skills aprofundadas (issue #100) ──────── */
+
+test('cupons é a skill densa piloto (Fase 1)', () => {
+  assert.ok(DENSE_SKILLS.includes('cupons'));
+});
+
+test('DENSE_SKILLS + PENDING_DENSE_SKILLS = as 5 skills priorizadas da #100', () => {
+  const todas = [...DENSE_SKILLS, ...PENDING_DENSE_SKILLS].sort();
+  assert.deepEqual(todas, [
+    'cupons',
+    'frete',
+    'multicd',
+    'pagamentos',
+    'status-pedido',
+  ]);
+});
+
+test('lintSkill: dense skill curta (valid-b.md + cupons) inclui R7', () => {
+  // valid-b.md é estruturalmente válida mas curta (< MIN_DENSE_LINES).
+  const errors = lintSkill('cupons', fx('valid-b.md'));
+  assert.ok(errors.some((e) => e.rule === 'R7'));
+});
+
+test('lintSkill: dense skill com ≥ MIN_DENSE_LINES não inclui R7', () => {
+  const padding = '\nlinha de conteúdo'.repeat(MIN_DENSE_LINES);
+  const content = fx('valid-b.md') + padding;
+  const errors = lintSkill('cupons', content);
+  assert.ok(!errors.some((e) => e.rule === 'R7'));
+});
+
+test('lintSkill: skill leve curta NÃO recebe R7 (piso só vale p/ DENSE_SKILLS)', () => {
+  const errors = lintSkill('kits', fx('valid-b.md'));
+  assert.ok(!errors.some((e) => e.rule === 'R7'));
 });

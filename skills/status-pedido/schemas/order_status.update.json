@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Order",
+  "description": "Payload de atualizacao do status de um pedido via PUT /orders/:id/status. access_token vai como query param (?access_token={token}), NUNCA em header. URL base https://{api_address}/ varia por loja. Body envolto na chave de recurso Order. O status_id deve referenciar um id existente no catalogo de status da loja (GET /orders/statuses, ver tray-status-pedido). Alterar o status de um pedido dispara o webhook de escopo order (acao update). Doc: https://developers.tray.com.br/#api-de-pedidos",
+  "type": "object",
+  "properties": {
+    "status_id": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "ID do status do catalogo da loja para o qual mover o pedido. Obtenha os ids validos via GET /orders/statuses (tray-status-pedido). Campo obrigatorio nesta operacao."
+    },
+    "tracking_code": {
+      "type": "string",
+      "maxLength": 120,
+      "description": "Codigo de rastreamento do envio, geralmente informado ao mover para um status de despacho/envio."
+    }
+  },
+  "required": [
+    "status_id"
+  ],
+  "additionalProperties": false
+}

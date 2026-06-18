@@ -16,8 +16,10 @@ import { findAllSchemas, loadSchema } from '../../mcp/lib/load-schemas.mjs';
 const __dir = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dir, '..', '..');
 
-// Smoke: neste workspace há 15 arquivos JSON em skills/<skill>/schemas/ (2026-05-14).
-const REPO_ROOT_EXPECTED_SCHEMA_COUNT = 15;
+// Smoke: neste workspace há 23 arquivos JSON em skills/<skill>/schemas/
+// (15 originais + 8 embarcados na issue #100: cupons, multicd, pagamentos,
+// frete e status-pedido).
+const REPO_ROOT_EXPECTED_SCHEMA_COUNT = 23;
 
 const KNOWN_SCHEMA_BASE_NAMES = [
   'produto.create',

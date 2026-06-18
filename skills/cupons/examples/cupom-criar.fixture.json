@@ -1,0 +1,13 @@
+{
+  "DiscountCoupon": {
+    "code": "PROMO10",
+    "description": "Promo Abril",
+    "starts_at": "2026-04-01",
+    "ends_at": "2026-04-30",
+    "value": "10.00",
+    "type": "%",
+    "usage_counter_limit": "",
+    "usage_counter_limit_customer": "5",
+    "cumulative_discount": "0"
+  }
+}

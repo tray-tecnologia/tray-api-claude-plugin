@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+/**
+ * Exemplo: Consultar dados completos do carrinho via API Tray
+ * Run: TRAY_CART_SESSION_ID=abc123 node skills/carrinho-compras/examples/carrinho-consultar-completo.node.mjs
+ * Doc: https://developers.tray.com.br/#apis-de-carrinho-de-compra
+ * Quando usar: obter todos os dados do carrinho (produtos, frete, cupom) em uma chamada.
+ * Pré-requisitos: TRAY_API_BASE, TRAY_ACCESS_TOKEN e TRAY_CART_SESSION_ID no env.
+ */
+const { TRAY_API_BASE, TRAY_ACCESS_TOKEN, TRAY_CART_SESSION_ID } = process.env;
+if (!TRAY_API_BASE || !TRAY_ACCESS_TOKEN || !TRAY_CART_SESSION_ID) {
+  throw new Error('Defina TRAY_API_BASE, TRAY_ACCESS_TOKEN e TRAY_CART_SESSION_ID');
+}
+
+const url = new URL(`${TRAY_API_BASE}/carts/${TRAY_CART_SESSION_ID}/complete`);
+url.searchParams.set('access_token', TRAY_ACCESS_TOKEN);
+
+const res = await fetch(url);
+if (!res.ok) {
+  console.error(`HTTP ${res.status}`, await res.text());
+  process.exit(1);
+}
+console.log(JSON.stringify(await res.json(), null, 2));

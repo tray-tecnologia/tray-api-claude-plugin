@@ -1,0 +1,7 @@
+{
+  "Payment": {
+    "status": "approved",
+    "transaction_id": "PAG-123456",
+    "paid_at": "2026-03-21 14:30:00"
+  }
+}

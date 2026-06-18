@@ -1,0 +1,8 @@
+{
+  "Cart": {
+    "customer_id": 456,
+    "product_id": 789,
+    "variant_id": 101,
+    "quantity": 2
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "ZipRange": {
+    "zip_start": "01000000",
+    "zip_end": "09999999",
+    "weight_start": 0,
+    "weight_end": 5000,
+    "price": "15.90",
+    "delivery_time": 5,
+    "additional_price_per_kg": "2.50"
+  }
+}

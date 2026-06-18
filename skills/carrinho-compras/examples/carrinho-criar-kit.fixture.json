@@ -1,0 +1,10 @@
+{
+  "Cart": {
+    "customer_id": 456,
+    "kit_id": 10,
+    "products": [
+      { "product_id": 789, "variant_id": 101, "quantity": 1 },
+      { "product_id": 790, "variant_id": 102, "quantity": 1 }
+    ]
+  }
+}

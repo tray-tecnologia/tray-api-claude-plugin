@@ -1,0 +1,11 @@
+{
+  "DistributionCenter": {
+    "name": "CD São Paulo",
+    "zip_code": "01310100",
+    "address": "Av. Paulista, 1000",
+    "city": "São Paulo",
+    "state": "SP",
+    "priority": 1,
+    "active": 1
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "DiscountCoupon": {
+    "description": "Promo Abril - Atualizada",
+    "value": "15.00",
+    "type": "%",
+    "ends_at": "2026-05-15"
+  }
+}

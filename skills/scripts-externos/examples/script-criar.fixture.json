@@ -1,0 +1,7 @@
+{
+  "Script": {
+    "url": "https://cdn.exemplo.com/meu-script.js",
+    "location": "footer",
+    "active": 1
+  }
+}

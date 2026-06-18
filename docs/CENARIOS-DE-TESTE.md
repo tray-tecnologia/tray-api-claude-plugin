@@ -5,6 +5,14 @@
 > seleção correta de skill (`when_not_to_use`), seguimento da seção
 > "Antes de responder" e correção dos hooks.
 >
+> **Atualização P2 (branch `feat/P2-qualidade-das-skills`):** cobre as issues
+> [#100](https://git.tray.net.br/ai/tasks/-/issues/100) (aprofundamento das 5
+> skills finas com schema de referência) e
+> [#101](https://git.tray.net.br/ai/tasks/-/issues/101) (exemplos executáveis
+> `curl` + Node por endpoint nas 34 skills) — ver Blocos 15 e 16. Dependências
+> externas (loja sandbox, CI nightly) em
+> [#118](https://git.tray.net.br/ai/tasks/-/issues/118).
+>
 > Cobertura completa em **Claude Code**, **Cursor** e **OpenAI Codex CLI**.
 > Smoke test em Gemini CLI, GitHub Copilot, JetBrains AI Assistant e Windsurf.
 
@@ -24,6 +32,10 @@
 - [Bloco 10 — Formats BR detectados pelo schema](#bloco-10--formats-br-detectados-pelo-schema)
 - [Bloco 11 — Skills novas com `validate.mjs`](#bloco-11--skills-novas-com-validatemjs)
 - [Bloco 12 — `search_docs.mjs` (tray-dev)](#bloco-12--search_docsmjs-tray-dev)
+- [Bloco 13 — `lint-skills.mjs` (P1.4)](#bloco-13--lint-skillsmjs-p14)
+- [Bloco 14 — Servidor MCP (P1.3)](#bloco-14--servidor-mcp-p13)
+- [Bloco 15 — Exemplos executáveis (`examples/`, issue #101)](#bloco-15--exemplos-executáveis-examples-issue-101)
+- [Bloco 16 — Skills aprofundadas + schema de referência (issue #100)](#bloco-16--skills-aprofundadas--schema-de-referência-issue-100)
 - [Próximos passos (robustez futura)](#próximos-passos-robustez-futura)
 
 ## Como usar este documento
@@ -71,7 +83,7 @@ Verificação por **inferência da resposta** (não há sinal direto). Os 4 pass
 3. Tokens/secrets via env vars (não literais)
 4. A skill escolhida bate com `when_to_use` / `when_not_to_use`
 
-O **passo 5** (apenas nas 5 skills com schema: `produtos`, `pedidos`, `autorizacao`, `webhooks`, `clientes`) é validado em **`validate.mjs` foi executado** abaixo.
+O **passo 5** (validação de payload) só tem **validador automático** (`validate.mjs`) nas **8 skills com schema validável**: `produtos`, `pedidos`, `autorizacao`, `webhooks`, `clientes`, `variacoes`, `categorias`, `marcas` — verificado em **`validate.mjs` foi executado** abaixo. Outras **5 skills** (`cupons`, `multicd`, `pagamentos`, `frete`, `status-pedido`) ganharam, na issue #100, **schema apenas de referência** em `schemas/` (sem `validate.mjs`): nelas o passo 5 é **revisão manual** dos campos contra o schema, não execução do validador. As **21 skills restantes** não têm schema.
 
 ### Hook `UserPromptSubmit` disparou *(apenas Claude Code e Cursor)*
 
@@ -118,8 +130,32 @@ Conferir que a URL gerada bate com a skill correspondente:
 | `tray-pedidos` | `GET/POST/PUT {api_address}/orders` |
 | `tray-clientes` | `GET/POST/PUT {api_address}/customers` |
 | `tray-webhooks` | listener no seu próprio servidor (Tray ativa por ticket) |
+| `tray-cupons` | `GET/POST/PUT/DELETE {api_address}/discount_coupons` |
+| `tray-multicd` | `GET/POST/PUT/DELETE {api_address}/distribution_centers` |
+| `tray-pagamentos` | `GET/POST/PUT/DELETE {api_address}/payments`, `GET .../payments/options`, `GET .../payments/settings` |
+| `tray-frete` | `GET {api_address}/shippings/cotation/`, `GET {api_address}/shippings/` |
+| `tray-status-pedido` | `GET/POST/PUT {api_address}/orders/statuses` |
 
 `access_token` deve estar como **query parameter**, nunca em header.
+
+### Exemplos `examples/` rodam *(issue #101)*
+
+Cada skill tem `skills/<recurso>/examples/` com pares `<endpoint>.curl.sh` +
+`<endpoint>.node.mjs` (e `.fixture.json` nos endpoints com body). Como verificar:
+
+- **Sintaxe (offline, sempre):** `node --check skills/<recurso>/examples/*.node.mjs`
+  e `bash -n skills/<recurso>/examples/*.curl.sh` não acusam erro.
+- **Fixture válida (offline, só nas 8 skills com `validate.mjs`):**
+  `node skills/<recurso>/scripts/validate.mjs --schema=<op> "$(cat skills/<recurso>/examples/<endpoint>.fixture.json)"`
+  retorna `✅` (exit 0).
+- **Fail-fast:** rodar o exemplo sem env vars (`unset TRAY_API_BASE`) sai com
+  exit ≠ 0 e mensagem `Defina TRAY_API_BASE …`.
+- **Sem credencial hardcoded:** nenhum `.sh`/`.mjs` contém token literal — tudo
+  via `${TRAY_ACCESS_TOKEN}` / `process.env`.
+- **Execução real contra a API:** requer `.env` com loja **sandbox**
+  (`cp .env.example .env`) — **bloqueado pela issue #118**. Exceção: o exemplo de
+  **webhook** roda 100% local (ver cenário 15.1).
+
 ## Bloco 1 — Geração de código (positivos legítimos)
 
 > Testa que a IA seleciona as skills certas, segue a seção "Antes de responder" e executa `validate.mjs` quando aplicável.
@@ -2152,6 +2188,277 @@ node mcp/server.mjs
 ```
 ```
 
+## Bloco 15 — Exemplos executáveis (`examples/`, issue #101)
+
+> Aplicável a Claude Code · Cursor · Codex (cenários de IA) e a qualquer shell
+> (cenários de CLI). Valida os exemplos runáveis `curl` + Node adicionados em
+> `skills/<recurso>/examples/` nas 34 skills. Os cenários 15.1–15.3 rodam
+> **offline**; o 15.4 depende da loja sandbox (issue #118).
+
+### 15.1 — Webhook end-to-end local (sem API)
+
+**Aplicável a:** qualquer shell (offline)
+**Bloco:** 15 — exemplos
+**O que valida:** o par receiver + sender do `tray-webhooks` roda localmente: o
+receiver parseia `application/x-www-form-urlencoded`, roteia por `scope_name+act`
+e responde HTTP 200; o sender dispara o evento da fixture.
+
+#### Comando (copy-paste)
+
+```bash
+WEBHOOK_PORT=3999 node skills/webhooks/examples/webhook-receiver.node.mjs &
+sleep 0.6
+WEBHOOK_URL=http://localhost:3999 node skills/webhooks/examples/webhook-enviar.node.mjs
+kill %1
+```
+
+#### Resultado esperado
+
+1. Receiver imprime `Webhook receiver ouvindo em http://localhost:3999`.
+2. Ao receber o POST, loga algo como `[pedido 4375797] update da loja 391250`.
+3. Sender imprime `Evento enviado: order_update → OK`.
+
+#### Checklist
+
+- [ ] **Receiver sobe** e loga a porta
+- [ ] **Evento roteado** por `scope_name+act` (linha `[pedido …]`)
+- [ ] **Sender recebe `OK`** (HTTP 200)
+- [ ] **Fixture `webhook.fixture.json` valida** com `validate.mjs --schema=webhook.payload`
+
+#### Observações
+
+```
+```
+
+---
+
+### 15.2 — Sintaxe + fixture válida de todos os exemplos (offline)
+
+**Aplicável a:** qualquer shell (offline)
+**Bloco:** 15
+**O que valida:** todos os `.node.mjs` passam em `node --check`, todos os
+`.curl.sh` em `bash -n`, e as fixtures das 8 skills com `validate.mjs` validam
+contra o schema.
+
+#### Comando (copy-paste)
+
+```bash
+for f in skills/*/examples/*.node.mjs; do node --check "$f" || echo "FALHOU $f"; done
+for f in skills/*/examples/*.curl.sh; do bash -n "$f" || echo "FALHOU $f"; done
+# fixtures das skills com validate.mjs (ex.: produtos):
+node skills/produtos/scripts/validate.mjs --schema=produto.create \
+  "$(cat skills/produtos/examples/produto-criar.fixture.json)"
+```
+
+#### Resultado esperado
+
+1. Nenhuma linha `FALHOU`.
+2. A validação da fixture retorna `✅ Payload válido` (exit 0).
+
+#### Checklist
+
+- [ ] **`node --check` limpo** em todos os `.node.mjs`
+- [ ] **`bash -n` limpo** em todos os `.curl.sh`
+- [ ] **Fixtures das 8 skills com schema validam** (exit 0)
+
+#### Observações
+
+```
+```
+
+---
+
+### 15.3 — Fail-fast sem variável de ambiente
+
+**Aplicável a:** qualquer shell (offline)
+**Bloco:** 15
+**O que valida:** um exemplo sem env vars sai com exit ≠ 0 e mensagem clara, sem
+tentar a chamada; e o destrutivo exige confirmação explícita.
+
+#### Comando (copy-paste)
+
+```bash
+env -u TRAY_API_BASE -u TRAY_ACCESS_TOKEN node skills/produtos/examples/produto-listar.node.mjs; echo "exit=$?"
+TRAY_API_BASE=x TRAY_ACCESS_TOKEN=y TRAY_PRODUCT_ID=1 \
+  node skills/produtos/examples/produto-excluir.node.mjs; echo "exit=$?"
+```
+
+#### Resultado esperado
+
+1. Primeiro: erro `Defina TRAY_API_BASE e TRAY_ACCESS_TOKEN`, `exit=1`.
+2. Segundo: erro pedindo `CONFIRM_DELETE=yes`, `exit=1` (não chama a API).
+
+#### Checklist
+
+- [ ] **Sem env → exit 1** com mensagem `Defina …`
+- [ ] **DELETE sem `CONFIRM_DELETE=yes` → exit 1** (guarda destrutiva)
+
+#### Observações
+
+```
+```
+
+---
+
+### 15.4 — Execução real contra a loja sandbox *(bloqueado por #118)*
+
+**Aplicável a:** qualquer shell — **requer loja sandbox (issue #118)**
+**Bloco:** 15
+**O que valida:** com `.env` apontando para a sandbox, um exemplo `GET` retorna
+2xx e JSON da API real.
+
+#### Comando (copy-paste)
+
+```bash
+cp .env.example .env   # preencher TRAY_API_BASE + TRAY_ACCESS_TOKEN da sandbox
+set -a; source .env; set +a
+bash skills/produtos/examples/produto-listar.curl.sh
+```
+
+#### Resultado esperado
+
+1. HTTP 2xx; JSON com a listagem de produtos da sandbox.
+
+#### Checklist
+
+- [ ] ⛔ **Pendente:** loja sandbox provisionada (#118)
+- [ ] **`GET` retorna 2xx + JSON** quando a sandbox existir
+
+#### Observações
+
+```
+```
+
+## Bloco 16 — Skills aprofundadas + schema de referência (issue #100)
+
+> Aplicável a Claude Code · Cursor · Codex. Valida o aprofundamento das 5 skills
+> finas (`cupons`, `multicd`, `pagamentos`, `frete`, `status-pedido`): SKILL.md
+> denso com `when_not_to_use`/disambiguation e `schemas/` **de referência**
+> (sem `validate.mjs` — a checagem de campos é manual, não executável).
+
+### 16.1 — Notificação de pagamento NÃO usa webhook `payment`
+
+**Aplicável a:** Claude Code · Cursor · Codex
+**Bloco:** 16 — skills aprofundadas
+**O que valida:** ao pedir notificação de mudança de status de pagamento, a IA
+**não inventa** um webhook `payment` (que não existe na Tray) e redireciona para
+o escopo `order` — disambiguation reforçada no `when_not_to_use` de `tray-pagamentos`.
+
+#### Prompt (copy-paste)
+
+> Quero receber um webhook toda vez que o pagamento de um pedido na minha loja Tray for aprovado. Como configuro o escopo `payment`?
+
+#### Resultado esperado
+
+1. A IA esclarece que **não existe escopo de webhook `payment`** na Tray.
+2. Aponta o escopo `order` (act=update) + campo `payments_notification`.
+3. Cruza para `tray-webhooks` e `tray-pedidos`.
+
+#### Checklist
+
+- [ ] **Não inventa webhook `payment`**
+- [ ] **Indica escopo `order`** como caminho correto
+- [ ] **Skill `tray-pagamentos`/`tray-webhooks`** (não promete um endpoint inexistente)
+
+#### Observações
+
+```
+```
+
+---
+
+### 16.2 — Configurar método de frete → `tray-configuracao-frete`, não `tray-frete`
+
+**Aplicável a:** Claude Code · Cursor · Codex
+**Bloco:** 16
+**O que valida:** `tray-frete` é somente leitura (cotação/listagem); pedido de
+**configuração** deve cair em `tray-configuracao-frete` (disambiguation do
+`when_not_to_use`).
+
+#### Prompt (copy-paste)
+
+> Na minha loja Tray, quero cadastrar uma nova transportadora com tabela de frete por faixa de CEP.
+
+#### Resultado esperado
+
+1. Skill: `tray-configuracao-frete` (`/shippings/method/gateway`, `/shippings/method/zipcode_table`).
+2. **Não** usa `tray-frete` para criar/configurar (ele só cota e lista).
+
+#### Checklist
+
+- [ ] **Skill correta:** `tray-configuracao-frete`
+- [ ] **Não trata `tray-frete` como CRUD** (reconhece que é só leitura)
+
+#### Observações
+
+```
+```
+
+---
+
+### 16.3 — Schema de referência: criar pagamento (revisão manual, sem `validate.mjs`)
+
+**Aplicável a:** Claude Code · Cursor · Codex
+**Bloco:** 16
+**O que valida:** `tray-pagamentos` tem `schemas/payment.create.json` **só de
+referência**. A IA confere os campos obrigatórios contra o schema (revisão
+manual) — **não** existe `validate.mjs` para essa skill, então não deve afirmar
+que "rodou o validador".
+
+#### Prompt (copy-paste)
+
+> Registre na Tray o pagamento aprovado via PIX do pedido 1001, valor 299.90, transaction_id PIX-123.
+
+#### Resultado esperado
+
+1. Skill: `tray-pagamentos`.
+2. Body com envelope `{"Payment":{...}}`, `payment_type` no enum (`pix`), `amount` decimal com ponto.
+3. Endpoint `POST {api_address}/payments`.
+4. A IA confere campos contra `skills/pagamentos/schemas/payment.create.json` — **sem** alegar execução de `validate.mjs` (não há para essa skill).
+
+#### Checklist
+
+- [ ] **Skill correta:** `tray-pagamentos`
+- [ ] **Envelope `{"Payment":{...}}`** e `amount` com ponto decimal
+- [ ] **Não alega ter rodado `validate.mjs`** (skill sem validador automático)
+- [ ] **Referencia o schema** para conferência de campos
+
+#### Observações
+
+```
+```
+
+---
+
+### 16.4 — `status-pedido`: state machine e cruzamento com webhooks
+
+**Aplicável a:** Claude Code · Cursor · Codex
+**Bloco:** 16
+**O que valida:** `tray-status-pedido` documenta a máquina de estados e o
+cruzamento com `tray-webhooks` (escopo `order`); a IA usa o endpoint de status
+correto, não confunde com `tray-pedidos`.
+
+#### Prompt (copy-paste)
+
+> Liste os status de pedido possíveis na minha loja Tray e mostre como mudar um pedido para "Enviado".
+
+#### Resultado esperado
+
+1. Skill: `tray-status-pedido` (`GET {api_address}/orders/statuses`).
+2. Mudança de status via `PUT` com `status_id` (cruza com `tray-pedidos`).
+3. Menciona que a transição dispara webhook de `order` (cruza com `tray-webhooks`).
+
+#### Checklist
+
+- [ ] **Skill correta:** `tray-status-pedido`
+- [ ] **Endpoint `/orders/statuses`** (não confunde com `/orders`)
+- [ ] **Cross-link** para `tray-pedidos` e/ou `tray-webhooks`
+
+#### Observações
+
+```
+```
+
 ## Próximos passos (robustez futura)
 
 A v1 cobre o suficiente para validar as mudanças da branch `feat/skill-validation-and-disambiguation`. Para uma v2, eis cenários extras já mapeados — mantidos aqui para o time não esquecer:
@@ -2174,9 +2481,13 @@ A v1 cobre o suficiente para validar as mudanças da branch `feat/skill-validati
 - **NCM com 7 dígitos** ou **EAN sem dígito verificador**.
 - **Datas em `DD/MM/YYYY`** (errado) vs `YYYY-MM-DD`.
 
-### Skills sem schema (29 restantes)
+### Skills sem schema (21 restantes)
 
-Adicionar cenários para `multi-cd`, `kits compostos`, `listas-preco-b2b`, `cupons`, `notas-fiscais`, etc.
+Estado atual: 8 skills com `validate.mjs` (schema validável) + 5 com schema de
+referência (`cupons`, `multicd`, `pagamentos`, `frete`, `status-pedido`, via #100)
+= 13 com `schemas/`; **21 sem schema**. Adicionar cenários para `kits compostos`,
+`notas-fiscais`, `listas-preco-b2b`, `enderecos-cliente`, etc. — e, conforme
+ganharem `validate.mjs`, promover as 5 de referência para o Bloco 11.
 
 ### Regressão / negativa
 

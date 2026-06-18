@@ -1,0 +1,8 @@
+{
+  "Customer": {
+    "name": "João Silva",
+    "email": "joao.silva@exemplo.com",
+    "phone": "11999998888",
+    "newsletter": 1
+  }
+}

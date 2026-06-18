@@ -294,6 +294,49 @@ Formats brasileiros (CPF/CNPJ/CEP/EAN/NCM com algoritmos de DV; date e
 datetime no formato Tray) são implementados em
 [`scripts/lib/formats-br.mjs`](scripts/lib/formats-br.mjs).
 
+## Como rodar exemplos localmente
+
+Cada endpoint documentado tem (ou terá) exemplos runáveis em `skills/<skill>/examples/`,
+em dois formatos: `curl` (`.curl.sh`) e Node 18+ (`.node.mjs`). Endpoints com corpo
+(`POST`/`PUT`) trazem também `<endpoint>.fixture.json` — o mesmo payload serve de
+input para o `validate.mjs`. O template e as convenções estão em
+[`docs/example-template.md`](docs/example-template.md).
+
+### 1. Configure as variáveis de ambiente
+
+Copie `.env.example` para `.env` e preencha com credenciais de uma **loja sandbox**:
+
+```bash
+cp .env.example .env
+# edite .env: TRAY_API_BASE, TRAY_ACCESS_TOKEN, ...
+set -a; source .env; set +a
+```
+
+| Var | Uso |
+|:--|:--|
+| `TRAY_API_BASE` | Host da API da loja (`api_address` do callback OAuth) |
+| `TRAY_ACCESS_TOKEN` | Token de acesso (expira em 3h) |
+| `TRAY_STORE_URL` | URL da vitrine — só fluxo OAuth |
+| `TRAY_CONSUMER_KEY` / `TRAY_CONSUMER_SECRET` | Credenciais do app — só `autorizacao` |
+| `TRAY_PRODUCT_ID` | ID de recurso para exemplos `GET/:id`, `PUT`, `DELETE` |
+
+### 2. Rode um exemplo
+
+```bash
+# curl
+bash skills/produtos/examples/produto-listar.curl.sh
+
+# Node (zero-install, fetch nativo)
+node skills/produtos/examples/produto-listar.node.mjs
+```
+
+Os exemplos são **fail-fast** (saem com exit ≠ 0 em env var faltando ou HTTP non-2xx)
+e **sandbox-first**. Exemplos destrutivos (`DELETE`) exigem confirmação explícita
+(`CONFIRM_DELETE=yes`). Nenhum token fica hardcoded — o hook `PostToolUse` bloqueia literais.
+
+Troubleshooting comum (`401`/`403`/`404`/`429`/`400`) na tabela final de
+[`docs/example-template.md`](docs/example-template.md).
+
 ## Busca em docs com `search_docs.mjs`
 
 A skill `tray-dev` indexa localmente `https://developers.tray.com.br` e oferece busca rápida (BM25) sobre todos os endpoints, parâmetros, exemplos e códigos de erro da API Tray.

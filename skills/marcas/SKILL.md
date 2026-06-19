@@ -71,10 +71,16 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
 | Campo | Tipo | Obrigatório | Descrição |
 |:--|:--|:--|:--|
 | `id` | number | — | ID da marca (retornado pela API) |
-| `name` | string | Sim | Nome da marca |
+| `brand` | string | Sim | Nome da marca |
 | `slug` | string | Não | Slug para URL amigável (gerado automaticamente se não informado) |
 | `description` | string | Não | Descrição da marca |
 | `image` | string | Não | URL da imagem/logotipo da marca |
+
+> **Atenção (causa #1 de HTTP 400 neste recurso):** o campo do nome da marca é
+> `brand`, **não** `name`. Enviar `{"Brand": {"name": "Nike"}}` resulta em
+> `HTTP 400`. Confirmado contra a doc oficial: o body e a resposta usam `brand`
+> (ex.: `{"Brand": {"slug": "nike", "brand": "Nike"}}`), e o filtro de listagem
+> também é `brand` (não `name`).
 
 ## Paginação
 
@@ -90,7 +96,7 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
 | Filtro | Tipo | Descrição |
 |:--|:--|:--|
 | `id` | number | Filtrar por ID da marca |
-| `name` | string | Filtrar por nome da marca |
+| `brand` | string | Filtrar por nome da marca |
 | `slug` | string | Filtrar por slug |
 
 ## Corpo da Requisição (POST/PUT)
@@ -98,7 +104,7 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
 ```json
 {
   "Brand": {
-    "name": "Nike",
+    "brand": "Nike",
     "slug": "nike",
     "description": "Marca esportiva internacional",
     "image": "https://exemplo.com/logo-nike.png"
@@ -129,7 +135,7 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
     {
       "Brand": {
         "id": "1",
-        "name": "Nike",
+        "brand": "Nike",
         "slug": "nike",
         "description": "Marca esportiva internacional",
         "image": "https://exemplo.com/logo-nike.png"
@@ -145,7 +151,7 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
 {
   "Brand": {
     "id": "1",
-    "name": "Nike",
+    "brand": "Nike",
     "slug": "nike",
     "description": "Marca esportiva internacional",
     "image": "https://exemplo.com/logo-nike.png"
@@ -173,8 +179,8 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
 ### O que o Claude faz
 
 1. Gera o código de criação com wrapper `Brand` e slug automático
-2. Inclui verificação de duplicidade via `GET /products/brands?name=...` antes de criar
-3. Monta o payload com nome, slug, descrição e URL do logo
+2. Inclui verificação de duplicidade via `GET /products/brands?brand=...` antes de criar
+3. Monta o payload com `brand` (nome), slug, descrição e URL do logo
 4. Explica que o `brand_id` retornado deve ser usado ao cadastrar produtos
 
 ### O que você recebe

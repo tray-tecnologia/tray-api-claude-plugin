@@ -1,6 +1,6 @@
 {
   "Brand": {
-    "name": "Acme",
+    "brand": "Acme",
     "slug": "acme",
     "active": 1
   }

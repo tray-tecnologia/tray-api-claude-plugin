@@ -26,7 +26,7 @@
 - [Bloco 4 — Hooks: falsos positivos](#bloco-4--hooks-falsos-positivos)
 - [Bloco 5 — Hooks: positivos legítimos](#bloco-5--hooks-positivos-legítimos)
 - [Bloco 6 — Hooks: regressão (nunca interrompe)](#bloco-6--hooks-regressão-nunca-interrompe)
-- [Bloco 7 — `PostToolUse` (Write/Edit/Bash)](#bloco-7--posttooluse-writeeditbash)
+- [Bloco 7 — `PostToolUse` (Write/Edit)](#bloco-7--posttooluse-writeeditbash)
 - [Bloco 8 — Smoke test ferramentas secundárias](#bloco-8--smoke-test-ferramentas-secundárias)
 - [Bloco 9 — `validate.mjs` v2 (CLI e output)](#bloco-9--validatemjs-v2-cli-e-output)
 - [Bloco 10 — Formats BR detectados pelo schema](#bloco-10--formats-br-detectados-pelo-schema)
@@ -43,10 +43,10 @@
 ### Pré-requisitos
 
 - O plugin Tray API está instalado na ferramenta que será testada:
-  - **Claude Code** — plugin instalado via `/plugin install` ou clone local; `/reload-plugins` mostrou `34 skills · 5 agents · 3 hooks`.
+  - **Claude Code** — plugin instalado via `/plugin install` ou clone local; `/reload-plugins` mostrou `34 skills · 5 agents · 1 hook`.
   - **Cursor** — `.cursor/rules/tray-api.mdc` presente no repositório de teste.
   - **Codex CLI** — `AGENTS.md` presente na raiz do repositório de teste.
-- Para os cenários de hook (Blocos 4–7), só Claude Code e Cursor são aplicáveis: as outras ferramentas não consomem `hooks/hooks.json`.
+- Para os cenários de hook (Bloco 7), só Claude Code e Cursor são aplicáveis: as outras ferramentas não consomem `hooks/hooks.json`.
 
 ### Fluxo
 
@@ -84,12 +84,6 @@ Verificação por **inferência da resposta** (não há sinal direto). Os 4 pass
 4. A skill escolhida bate com `when_to_use` / `when_not_to_use`
 
 O **passo 5** (validação de payload) só tem **validador automático** (`validate.mjs`) nas **8 skills com schema validável**: `produtos`, `pedidos`, `autorizacao`, `webhooks`, `clientes`, `variacoes`, `categorias`, `marcas` — verificado em **`validate.mjs` foi executado** abaixo. Outras **5 skills** (`cupons`, `multicd`, `pagamentos`, `frete`, `status-pedido`) ganharam, na issue #100, **schema apenas de referência** em `schemas/` (sem `validate.mjs`): nelas o passo 5 é **revisão manual** dos campos contra o schema, não execução do validador. As **21 skills restantes** não têm schema.
-
-### Hook `UserPromptSubmit` disparou *(apenas Claude Code e Cursor)*
-
-- **Claude Code** — turn da resposta → expandir **System** / **Hooks** → texto começando com *"IMPORTANTE: Este contexto é APENAS informativo…"*. *Fallback CLI:* rodar com `claude --debug` e procurar `UserPromptSubmit` no log.
-- **Cursor** — painel de contexto da mensagem (seção *Additional context*). *Fallback:* segundo turno *"você recebeu algum aviso/contexto adicional sobre OAuth ou rate limit antes de responder?"*. Se sim, hook disparou.
-- **Codex / Gemini / Copilot / JetBrains / Windsurf** — N/A, não consomem `hooks/hooks.json`.
 
 ### `validate.mjs` foi executado
 
@@ -188,8 +182,6 @@ A IA deve:
 - [ ] **Endpoints corretos:** `POST {api_address}/auth` (etapa 3) + `GET {api_address}/products?access_token=…`
 - [ ] **Sem credenciais hardcoded:** uso de `process.env.TRAY_*` ou equivalente
 - [ ] **`validate.mjs --schema=<op>` executado:** com a flag explícita para o schema correto da operação
-- [ ] **Hook `UserPromptSubmit` disparou** *(apenas CC / Cursor)*: contexto OAuth foi injetado
-- [ ] **Hook não interrompeu a operação:** resposta foi entregue normalmente
 
 #### Observações
 
@@ -225,8 +217,6 @@ A IA deve:
 - [ ] **Chave-envelope:** body envolto em `{"Product": {...}}`
 - [ ] **Endpoint correto:** `POST {api_address}/products?access_token=…`
 - [ ] **`validate.mjs --schema=<op>` executado:** com a flag explícita para o schema correto da operação
-- [ ] **Hook `UserPromptSubmit` disparou** *(apenas CC / Cursor)*: contexto OAuth foi injetado (gatilho `/products`)
-- [ ] **Hook não interrompeu:** resposta foi entregue normalmente
 
 #### Observações
 
@@ -262,8 +252,6 @@ A IA deve:
 - [ ] **Paginação:** `limit ≤ 50`, loop com `pager.total`
 - [ ] **Endpoint correto:** `GET {api_address}/orders?access_token=…`
 - [ ] **Sem credenciais hardcoded**
-- [ ] **Hook `UserPromptSubmit` disparou** *(apenas CC / Cursor)*: gatilho `/orders`
-- [ ] **Hook não interrompeu**
 
 #### Observações
 
@@ -299,9 +287,6 @@ A IA deve:
 - [ ] **CPF normalizado:** 11 dígitos, sem pontuação
 - [ ] **Endpoint correto:** `POST {api_address}/customers?access_token=…`
 - [ ] **`validate.mjs --schema=<op>` executado:** com a flag explícita para o schema correto da operação
-- [ ] **Hook `UserPromptSubmit` disparou** *(apenas CC / Cursor)*: gatilho `/customers`
-- [ ] **Hook não interrompeu**
-
 #### Observações
 
 ```
@@ -336,9 +321,6 @@ A IA deve:
 - [ ] **Listener correto:** parse de `x-www-form-urlencoded`, leitura de `seller_id`/`scope_id`/`scope_name`/`act`
 - [ ] **`validate.mjs --schema=<op>` executado:** com a flag explícita para o schema correto da operação
 - [ ] **Menção a ativação por ticket de suporte**
-- [ ] **Hook `UserPromptSubmit` disparou** *(apenas CC / Cursor)*: gatilho `api.*tray`
-- [ ] **Hook não interrompeu**
-
 #### Observações
 
 ```
@@ -370,9 +352,6 @@ A IA deve:
 - [ ] **Skill correta:** `tray-variacoes` (não `tray-produtos`)
 - [ ] **Endpoint correto:** `/products/{id}/variants`
 - [ ] **`when_not_to_use` foi respeitado:** a IA não tentou criar/editar o produto-pai
-- [ ] **Hook `UserPromptSubmit` disparou** *(apenas CC / Cursor)*: gatilho `tray-api`/`/products`
-- [ ] **Hook não interrompeu**
-
 #### Observações
 
 ```
@@ -403,9 +382,6 @@ A IA deve:
 - [ ] **Skill correta:** `tray-imagens-produtos` (não `tray-produtos`)
 - [ ] **Endpoint correto:** `/products/{id}/images`
 - [ ] **`when_not_to_use` foi respeitado**
-- [ ] **Hook `UserPromptSubmit` disparou** *(apenas CC / Cursor)*
-- [ ] **Hook não interrompeu**
-
 #### Observações
 
 ```
@@ -436,9 +412,6 @@ A IA deve:
 - [ ] **Skill correta:** `tray-kits` (não `tray-produtos`)
 - [ ] **Endpoint correto:** `/kits`
 - [ ] **`when_not_to_use` foi respeitado**
-- [ ] **Hook `UserPromptSubmit` disparou** *(apenas CC / Cursor)*
-- [ ] **Hook não interrompeu**
-
 #### Observações
 
 ```
@@ -469,9 +442,6 @@ A IA deve:
 - [ ] **Skill correta:** `tray-categorias` (não `tray-produtos`)
 - [ ] **Endpoint correto:** `/categories`
 - [ ] **`when_not_to_use` foi respeitado**
-- [ ] **Hook `UserPromptSubmit` disparou** *(apenas CC / Cursor)*
-- [ ] **Hook não interrompeu**
-
 #### Observações
 
 ```
@@ -509,9 +479,6 @@ A IA deve:
 - [ ] **`validate.mjs --schema=<op>` executado:** com a flag explícita para o schema correto da operação
 - [ ] **`validate.mjs` rejeitou:** sim, com mensagem sobre `name`
 - [ ] **IA corrigiu/alertou:** não entregou código que estouraria HTTP 400
-- [ ] **Hook `UserPromptSubmit` disparou** *(apenas CC / Cursor)*: gatilho `tray-api`
-- [ ] **Hook não interrompeu**
-
 #### Observações
 
 ```
@@ -548,9 +515,6 @@ A IA deve:
 - [ ] **`validate.mjs` rejeitou pelo `format: cpf`** (mensagem menciona "CPF inválido" / "algoritmo de verificação")
 - [ ] **A IA não enviou à API** (regressão do comportamento anterior, em que `validate` aprovava o payload)
 - [ ] **A IA pediu CPF correto ao usuário**
-- [ ] **Hook `UserPromptSubmit` disparou** *(apenas CC / Cursor)*
-- [ ] **Hook não interrompeu**
-
 #### Observações
 
 ```
@@ -586,282 +550,34 @@ A IA deve:
 - [ ] **`validate.mjs` executado**
 - [ ] **`validate.mjs` rejeitou por `act` ausente**
 - [ ] **IA explicou o erro:** mencionou `insert`/`update`/`delete`
-- [ ] **Hook `UserPromptSubmit` disparou** *(apenas CC / Cursor)*: gatilho `api.*tray`
-- [ ] **Hook não interrompeu**
-
 #### Observações
 
 ```
 ```
 ## Bloco 4 — Hooks: falsos positivos
 
-> *Aplicável apenas a Claude Code e Cursor.* Testa que o hook `UserPromptSubmit` **NÃO** dispara em prompts que mencionam "tray" mas não têm relação com a API Tray. O matcher antigo (`tray|Tray|TRAY`) disparava nesses casos; o novo (`api.*tray|tray.*api|api_address|...`) não.
+> **⚠️ DESCONTINUADO.** Este bloco testava o hook `UserPromptSubmit` (que NÃO
+> deveria disparar em prompts não-Tray). Esse hook foi removido do plugin no
+> commit `d74c2b0` (2026-05-13). O `hooks/hooks.json` atual tem apenas o hook
+> `PostToolUse` com matcher `Write|Edit` (ver Bloco 7). Os cenários deste bloco
+> não se aplicam mais e foram removidos.
 
-### 4.1 — Ícone base64 para meu app
-
-**Aplicável a:** Claude Code · Cursor *(hook não existe nas demais)*
-**Bloco:** 4 — Hooks: falsos positivos
-**O que valida:** sem qualquer menção a "tray", o hook não dispara.
-
-#### Prompt (copy-paste)
-
-> Crie um ícone em base64 para o meu app.
-
-#### Resultado esperado
-
-1. Hook `UserPromptSubmit` **NÃO** dispara — não há nenhuma das palavras-chave do matcher.
-2. A IA responde com um SVG/PNG em base64, sem injeção de contexto da Tray.
-
-#### Checklist de verificação
-
-- [ ] **Hook NÃO disparou:** painel "System"/"Hooks" ou "Additional context" vazio para este prompt
-- [ ] **Resposta sem contexto da Tray:** nenhuma menção a OAuth, `access_token`, `api_address`
-- [ ] **A IA respondeu o que foi pedido:** ícone base64
-
-#### Observações
-
-```
-```
-
----
-
-### 4.2 — Ícone para projeto tray-api-claude-plugin
-
-**Aplicável a:** Claude Code · Cursor *(hook não existe nas demais)*
-**Bloco:** 4 — Hooks: falsos positivos
-**O que valida:** "tray" como nome de projeto **não** dispara o hook (regressão importante: matcher antigo disparava).
-
-#### Prompt (copy-paste)
-
-> Gere um ícone SVG simples para o projeto tray-api-claude-plugin.
-
-#### Resultado esperado
-
-1. Hook `UserPromptSubmit` **NÃO** dispara — "tray" aparece no nome do projeto, mas não há `api.*tray`/`tray.*api`/`api_address`/etc. correlacionado **na pergunta** (o nome do projeto contém "tray-api" mas como hífen e o regex usa `.*` então pode acabar disparando — registrar o resultado real).
-2. A IA gera um SVG sem injeção de contexto.
-
-> **Nota:** este cenário é um caso de borda. O matcher novo `api.*tray|tray.*api` pode disparar pelo trecho "tray-api" no nome do projeto. Se disparar, anotar nas observações — revisar matcher.
-
-#### Checklist de verificação
-
-- [ ] **Hook NÃO disparou** (resultado ideal)
-- [ ] **Caso disparou:** anotar em "Observações" — pode ser caso de borda do matcher
-- [ ] **Resposta sem contexto irrelevante da Tray**
-
-#### Observações
-
-```
-```
-
----
-
-### 4.3 — "Tray de comida" em CSS
-
-**Aplicável a:** Claude Code · Cursor *(hook não existe nas demais)*
-**Bloco:** 4 — Hooks: falsos positivos
-**O que valida:** "tray" como palavra comum (bandeja) **não** dispara o hook.
-
-#### Prompt (copy-paste)
-
-> Tenho um componente React de bandeja (tray) de comida. Como estilizo o background com CSS?
-
-#### Resultado esperado
-
-1. Hook `UserPromptSubmit` **NÃO** dispara — sem palavras-chave da API.
-2. A IA responde sobre CSS, sem injeção da Tray.
-
-#### Checklist de verificação
-
-- [ ] **Hook NÃO disparou**
-- [ ] **Resposta sem contexto da Tray**
-- [ ] **A IA respondeu o que foi pedido:** CSS/styling
-
-#### Observações
-
-```
-```
-
----
-
-### 4.4 — Lib de UI chamada Tray
-
-**Aplicável a:** Claude Code · Cursor *(hook não existe nas demais)*
-**Bloco:** 4 — Hooks: falsos positivos
-**O que valida:** "Tray" como nome próprio de outra lib **não** dispara o hook.
-
-#### Prompt (copy-paste)
-
-> Existe uma lib de UI chamada Tray para mobile? Tem alternativa em React Native?
-
-#### Resultado esperado
-
-1. Hook `UserPromptSubmit` **NÃO** dispara — sem palavras-chave da API Tray.
-2. A IA responde sobre libs de UI, sem injeção de contexto da Tray.
-
-#### Checklist de verificação
-
-- [ ] **Hook NÃO disparou**
-- [ ] **Resposta sem contexto da API Tray**
-- [ ] **A IA não confundiu com a plataforma de e-commerce**
-
-#### Observações
-
-```
-```
 ## Bloco 5 — Hooks: positivos legítimos
 
-> *Aplicável apenas a Claude Code e Cursor.* Testa que o hook `UserPromptSubmit` dispara em prompts legítimos da API Tray e injeta o contexto OAuth.
+> **⚠️ DESCONTINUADO.** Este bloco testava o hook `UserPromptSubmit` disparando
+> em prompts legítimos da API Tray e injetando contexto OAuth. Esse hook foi
+> removido do plugin no commit `d74c2b0` (2026-05-13) — o contexto OAuth/rate
+> limit agora vem do bloco MANDATORY das próprias skills, não de um hook. Os
+> cenários deste bloco não se aplicam mais e foram removidos.
 
-### 5.1 — Autenticação na API Tray
-
-**Aplicável a:** Claude Code · Cursor *(hook não existe nas demais)*
-**Bloco:** 5 — Hooks: positivos legítimos
-**O que valida:** o gatilho `api.*tray` (e/ou `access_token`/`refresh_token`) dispara.
-
-#### Prompt (copy-paste)
-
-> Como faço autenticação na API Tray? Preciso entender o fluxo de access_token e refresh_token.
-
-#### Resultado esperado
-
-1. Hook `UserPromptSubmit` **DISPARA** — match em `api.*tray`, `access_token` e `refresh_token` (qualquer um já basta — múltiplos garantem o disparo mesmo se o regex for case-sensitive).
-2. Contexto da Tray injetado: aviso "APENAS informativo" + lembretes de OAuth, expiração, rate limit, URL base.
-3. A IA responde sobre OAuth 2.0 de 3 etapas usando a skill `tray-autorizacao`.
-
-#### Checklist de verificação
-
-- [ ] **Hook disparou:** sim, contexto injetado
-- [ ] **Texto do hook começa com "IMPORTANTE: Este contexto é APENAS informativo"**
-- [ ] **Skill correta usada:** `tray-autorizacao`
-- [ ] **A IA explicou o fluxo OAuth de 3 etapas**
-- [ ] **Hook não interrompeu**
-
-#### Observações
-
-```
-```
-
----
-
-### 5.2 — Erro 401 com access_token
-
-**Aplicável a:** Claude Code · Cursor *(hook não existe nas demais)*
-**Bloco:** 5 — Hooks: positivos legítimos
-**O que valida:** o gatilho `access_token` dispara mesmo sem mencionar "Tray".
-
-#### Prompt (copy-paste)
-
-> Estou recebendo erro 401 toda vez que tento usar o access_token. O que pode ser?
-
-#### Resultado esperado
-
-1. Hook `UserPromptSubmit` **DISPARA** — match em `access_token`.
-2. Contexto da Tray injetado.
-3. A IA explica códigos `1000`–`1099` e sugere renovar via `refresh_token`.
-
-#### Checklist de verificação
-
-- [ ] **Hook disparou:** sim
-- [ ] **A IA reconheceu o contexto Tray (mesmo sem o usuário mencionar)**
-- [ ] **A IA explicou códigos 1000–1099 e renovação via refresh_token**
-- [ ] **Hook não interrompeu**
-
-#### Observações
-
-```
-```
-
----
-
-### 5.3 — Configurar refresh_token
-
-**Aplicável a:** Claude Code · Cursor *(hook não existe nas demais)*
-**Bloco:** 5 — Hooks: positivos legítimos
-**O que valida:** o gatilho `refresh_token` dispara.
-
-#### Prompt (copy-paste)
-
-> Como configuro renovação automática do refresh_token na minha integração?
-
-#### Resultado esperado
-
-1. Hook `UserPromptSubmit` **DISPARA** — match em `refresh_token`.
-2. A IA usa `tray-autorizacao` e explica `GET {api_address}/auth?refresh_token=…` + expiração de 30 dias do `refresh_token`.
-
-#### Checklist de verificação
-
-- [ ] **Hook disparou:** sim
-- [ ] **Skill correta:** `tray-autorizacao`
-- [ ] **Endpoint correto:** `GET {api_address}/auth?refresh_token=…`
-- [ ] **Mencionou expiração de 30 dias**
-- [ ] **Hook não interrompeu**
-
-#### Observações
-
-```
-```
 ## Bloco 6 — Hooks: regressão (nunca interrompe)
 
-> *Aplicável apenas a Claude Code e Cursor.* Testa que mesmo quando o hook `UserPromptSubmit` dispara, ele é APENAS informativo — nunca interrompe, bloqueia ou contamina respostas para pedidos não-Tray.
+> **⚠️ DESCONTINUADO.** Este bloco testava que o hook `UserPromptSubmit`, mesmo
+> disparando, era apenas informativo e nunca interrompia respostas não-Tray.
+> Esse hook foi removido do plugin no commit `d74c2b0` (2026-05-13). O
+> `hooks/hooks.json` atual tem apenas `PostToolUse` (matcher `Write|Edit`, ver
+> Bloco 7). Os cenários deste bloco não se aplicam mais e foram removidos.
 
-### 6.1 — Hook dispara mas pedido é não-Tray
-
-**Aplicável a:** Claude Code · Cursor *(hook não existe nas demais)*
-**Bloco:** 6 — Hooks: regressão
-**O que valida:** prompt com keyword da API Tray que pede explicitamente algo não-Tray. O `access_token` é deliberadamente incluído para garantir match (case-insensitive ou case-sensitive).
-
-#### Prompt (copy-paste)
-
-> Já usei a API Tray (com access_token) no passado, mas agora preciso aprender autenticação genérica em Express com Passport.js. Me explica do zero, sem mencionar Tray.
-
-#### Resultado esperado
-
-1. Hook `UserPromptSubmit` **DISPARA** (match em `access_token` no mínimo).
-2. A IA **ignora** o contexto injetado (porque o usuário pediu explicitamente algo genérico) e responde sobre Express + Passport.js.
-3. A resposta **não** menciona OAuth da Tray, `access_token`, `consumer_key` etc.
-
-#### Checklist de verificação
-
-- [ ] **Hook disparou** *(esperado)*
-- [ ] **Resposta foca em Express + Passport.js**
-- [ ] **Resposta NÃO menciona Tray, OAuth Tray, `access_token`, `consumer_key`**
-- [ ] **Hook não interrompeu nem contaminou** *(esta é a regressão crítica)*
-
-#### Observações
-
-```
-```
-
----
-
-### 6.2 — Pedido principal não-Tray com menção tangencial
-
-**Aplicável a:** Claude Code · Cursor *(hook não existe nas demais)*
-**Bloco:** 6 — Hooks: regressão
-**O que valida:** prompt cujo objetivo principal é não-Tray, mas com menção tangencial a `/customers`.
-
-#### Prompt (copy-paste)
-
-> Crie uma função utilitária em JS que valide CPF. Ela vai ser usada num projeto que integra com /customers da Tray no futuro.
-
-#### Resultado esperado
-
-1. Hook `UserPromptSubmit` **DISPARA** (match em `/customers`).
-2. A IA entrega **apenas** a função de validação de CPF (algoritmo dos dígitos verificadores), sem cadastrar cliente nem chamar `tray-clientes`.
-3. A resposta menciona o uso futuro mas não desvia para implementação Tray.
-
-#### Checklist de verificação
-
-- [ ] **Hook disparou** *(esperado)*
-- [ ] **A IA entregou apenas a função de validação de CPF**
-- [ ] **A IA NÃO tentou cadastrar cliente na Tray**
-- [ ] **A função aplica algoritmo dos dígitos verificadores** (não só `length === 11`)
-- [ ] **Hook não interrompeu nem contaminou**
-
-#### Observações
-
-```
-```
 ## Bloco 7 — `PostToolUse` e regressão de hooks
 
 > *Aplicável apenas a Claude Code e Cursor.*
@@ -872,11 +588,16 @@ A IA deve:
 > triviais como `ls`/`find`. Detalhes em
 > `docs/ANALISE-HOOK-POSTTOOLUSE-BASH.md`.
 >
-> A orientação reativa que ele tentava prover (HTTP 401/429/400/404)
-> agora chega **proativamente** via `UserPromptSubmit` (Bloco 5/6).
+> **Atualização:** o hook `UserPromptSubmit` (que injetava orientação HTTP
+> 401/429/400/404 proativamente) também foi **descontinuado** no commit
+> `d74c2b0` (2026-05-13). O `hooks/hooks.json` atual tem **apenas** o hook
+> `PostToolUse` com matcher `Write|Edit`. O tratamento de erros HTTP é hoje
+> responsabilidade das skills (bloco MANDATORY + seção "Tratamento de erros
+> HTTP" do `CLAUDE.md`), não de um hook.
 >
-> Sub-grupo 7A continua testando `PostToolUse:Write|Edit`. Sub-grupo 7B
-> agora valida o comportamento **migrado** e a regressão do bug.
+> Sub-grupo 7A continua testando `PostToolUse:Write|Edit` (único hook ativo).
+> Sub-grupo 7B está **descontinuado** (testava a orientação via
+> `UserPromptSubmit`).
 
 ### Sub-grupo 7A — `Write|Edit`
 
@@ -1003,137 +724,20 @@ A IA deve:
 
 ---
 
-### Sub-grupo 7B — Pós-Bash (orientação HTTP migrada para `UserPromptSubmit`)
+### Sub-grupo 7B — Regressão: `Bash` nunca dispara hook
 
-> Na 1.2.0, o hook reativo de Bash foi removido. A orientação sobre erros
-> HTTP da Tray (401/429/400/404) agora é entregue **proativamente** pelo
-> `UserPromptSubmit` quando o usuário menciona Tray no prompt. Os cenários
-> abaixo validam o comportamento migrado e a regressão do bug que motivou
-> a mudança.
+> **⚠️ Cenários 7.5–7.8 DESCONTINUADOS.** Testavam orientação HTTP
+> (401/429/400/404) injetada proativamente pelo hook `UserPromptSubmit`, que
+> foi removido no commit `d74c2b0` (2026-05-13). Não há mais hook que injete
+> contexto no prompt nem que reaja a `Bash`. O tratamento de erros HTTP é hoje
+> responsabilidade das skills (bloco MANDATORY + seção "Tratamento de erros
+> HTTP" do `CLAUDE.md`).
+>
+> Os cenários **7.9 e 7.10 permanecem válidos**: confirmam que comandos `Bash`
+> (triviais ou de inspeção do plugin) **não disparam nenhum hook** — o único
+> hook ativo é `PostToolUse` com matcher `Write|Edit`, que não casa `Bash`.
 
-#### 7.5 — HTTP 401 (token inválido/expirado) — orientação proativa
-
-**Aplicável a:** Claude Code · Cursor
-**Bloco:** 7B — pós-Bash
-**O que valida:** o `UserPromptSubmit` injeta orientação sobre HTTP 401, e a IA principal aplica corretamente quando vê o erro na saída de um `Bash`.
-
-##### Prompt (copy-paste)
-
-> Roda este curl na minha loja Tray: `curl -i 'https://abc.commercesuite.com.br/products?access_token=invalid'` e me explica o resultado.
-
-##### Resultado esperado
-
-1. `UserPromptSubmit` casa (menciona "loja Tray") e injeta o contexto com a orientação HTTP 401.
-2. A IA executa o `curl` via `Bash`; saída tem `HTTP/1.1 401`.
-3. **Sem nenhum hook reativo intermediário,** a IA — já munida do contexto do `UserPromptSubmit` — reconhece o 401 e explica:
-   - "`access_token` expirado/inválido"
-   - "renovar via `GET https://{api_address}/auth?refresh_token={token}`"
-
-##### Checklist de verificação
-
-- [ ] **`Bash` foi executado e retornou HTTP 401**
-- [ ] **NENHUM `hook stopped continuation` apareceu** *(regressão do bug do `PostToolUse:Bash`)*
-- [ ] **A IA mencionou `refresh_token` e renovação**
-- [ ] **A IA explicou ao usuário a causa e a solução**
-
-##### Observações
-
-```
-```
-
----
-
-#### 7.6 — HTTP 429 (rate limit) — orientação proativa
-
-**Aplicável a:** Claude Code · Cursor
-**Bloco:** 7B — pós-Bash
-**O que valida:** orientação de `UserPromptSubmit` sobre rate limit (180 req/min, 10.000 req/dia, backoff) chega à IA principal e é aplicada quando ela vê HTTP 429.
-
-##### Prompt (copy-paste)
-
-> Roda um loop com 200 requisições para GET /products da minha loja Tray e me mostra o que aconteceu nas últimas 20 respostas.
-
-##### Resultado esperado
-
-1. `UserPromptSubmit` casa e injeta o contexto.
-2. A IA executa um loop via `Bash`; algumas respostas voltam HTTP 429.
-3. A IA, com o contexto, propõe ou implementa backoff exponencial e/ou agrupamento em lotes.
-
-##### Checklist de verificação
-
-- [ ] **`Bash` foi executado e ao menos uma resposta foi HTTP 429**
-- [ ] **NENHUM `hook stopped continuation` apareceu**
-- [ ] **A IA propôs backoff exponencial** *(ou agrupamento em lotes)*
-- [ ] **A IA mencionou os limites (180 req/min, 10.000 req/dia)**
-
-##### Observações
-
-```
-```
-
----
-
-#### 7.7 — HTTP 400 (campo obrigatório / formato inválido) — orientação proativa
-
-**Aplicável a:** Claude Code · Cursor
-**Bloco:** 7B — pós-Bash
-**O que valida:** orientação do `UserPromptSubmit` sobre `validate.mjs` chega à IA, que sugere/roda o validador local antes de tentar a API novamente.
-
-##### Prompt (copy-paste)
-
-> Roda este curl para criar um produto na Tray: `curl -X POST 'https://abc.commercesuite.com.br/products?access_token=TOKEN' -d '{"Product": {"price": 99}}'` e mostra o resultado.
-
-##### Resultado esperado
-
-1. `UserPromptSubmit` casa e injeta o contexto.
-2. A IA executa o `curl`; saída: HTTP 400 com mensagem sobre `name` obrigatório.
-3. A IA sugere — ou executa — `skills/produtos/scripts/validate.mjs` localmente, identifica o campo faltando e corrige.
-
-##### Checklist de verificação
-
-- [ ] **`Bash` foi executado e retornou HTTP 400**
-- [ ] **NENHUM `hook stopped continuation` apareceu**
-- [ ] **A IA mencionou ou executou `validate.mjs`**
-- [ ] **A IA identificou o campo faltando antes de tentar de novo**
-
-##### Observações
-
-```
-```
-
----
-
-#### 7.8 — HTTP 404 (URL base errada / `api_address` incorreto) — orientação proativa
-
-**Aplicável a:** Claude Code · Cursor
-**Bloco:** 7B — pós-Bash
-**O que valida:** orientação do `UserPromptSubmit` sobre `api_address` específico por loja chega à IA principal.
-
-##### Prompt (copy-paste)
-
-> Roda este curl: `curl -i 'https://api.tray.com.br/products?access_token=TOKEN'` (sem usar o api_address da loja, usei o domínio público) e me explica o erro.
-
-##### Resultado esperado
-
-1. `UserPromptSubmit` casa e injeta o contexto.
-2. A IA executa o `curl`; saída: HTTP 404 ou similar.
-3. A IA explica que `{api_address}` é específico por loja, retornado no callback OAuth.
-
-##### Checklist de verificação
-
-- [ ] **`Bash` foi executado e retornou HTTP 404**
-- [ ] **NENHUM `hook stopped continuation` apareceu**
-- [ ] **A IA mencionou que `{api_address}` é específico por loja**
-- [ ] **A IA explicou a relação com o callback OAuth**
-
-##### Observações
-
-```
-```
-
----
-
-#### 7.9 — Bash sem chamada à Tray (regressão crítica do bug do `PostToolUse:Bash`)
+#### 7.9 — Bash sem chamada à Tray (regressão: `Bash` não casa nenhum hook)
 
 **Aplicável a:** Claude Code · Cursor
 **Bloco:** 7B — pós-Bash
@@ -1768,10 +1372,10 @@ A IA deve:
 #### Resultado esperado
 
 1. Skill: `tray-marcas`.
-2. Primeira tentativa: `validate.mjs --schema=marca.create '{"Brand":{"name":"Nike Air","slug":"Nike Air"}}'` → exit `1` com mensagem mencionando `pattern`.
+2. Primeira tentativa: `validate.mjs --schema=marca.create '{"Brand":{"brand":"Nike Air","slug":"Nike Air"}}'` → exit `1` com mensagem mencionando `pattern`.
 3. A IA corrige slug para `'nike-air'` (lowercase, hífen) e re-valida.
 4. Segunda tentativa exit `0`.
-5. Endpoint: `POST {api_address}/brands`.
+5. Endpoint: `POST {api_address}/products/brands` (campo do nome é `brand`, não `name`).
 
 #### Checklist
 

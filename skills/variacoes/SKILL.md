@@ -68,19 +68,30 @@ Documentação oficial: https://developers.tray.com.br/#apis-de-variacao-de-prod
 
 ## Campos da Variação
 
-| Campo | Tipo | Descrição |
-|:--|:--|:--|
-| `product_id` | number | ID do produto pai (obrigatório na criação) |
-| `ean` | string | Código de barras da variação |
-| `price` | decimal | Preço da variação (herda do produto se não informado) |
-| `cost_price` | decimal | Preço de custo |
-| `stock` | number | Estoque da variação |
-| `weight` | number | Peso em gramas |
-| `length` | number | Comprimento |
-| `width` | number | Largura |
-| `height` | number | Altura |
-| `reference` | string | Referência interna da variação |
-| `values` | array | Atributos da variação (ex: cor, tamanho) |
+| Campo | Tipo | Obrigatório (create) | Descrição |
+|:--|:--|:--|:--|
+| `product_id` | number | **Sim** | ID do produto pai |
+| `type_1` | string | **Sim** | Nome do 1º atributo (ex: "Cor") |
+| `value_1` | string | **Sim** | Valor do 1º atributo (ex: "Azul") |
+| `type_2` | string | Condicional | Nome do 2º atributo; **obrigatório se `value_2` presente** |
+| `value_2` | string | Condicional | Valor do 2º atributo; **obrigatório se `type_2` presente** |
+| `price` | decimal | Não | Preço da variação (herda do produto se não informado) |
+| `cost_price` | decimal | Não | Preço de custo |
+| `stock` | number | Não | Estoque da variação |
+| `ean` | string | Não | Código de barras da variação |
+| `reference` | string | Não | Referência interna da variação |
+| `weight` | number | Não | Peso em gramas |
+| `length` | number | Não | Comprimento |
+| `width` | number | Não | Largura |
+| `height` | number | Não | Altura |
+
+> ⚠️ **Atributos são campos planos `type_N`/`value_N`, NÃO um array.** A API
+> **não** aceita um campo `values: [{name, value}]` — esse formato resulta em
+> erro de validação (campos `type_1`/`value_1` ausentes). A plataforma suporta
+> **no máximo 2 eixos de atributo**: `type_1`/`value_1` e `type_2`/`value_2`.
+>
+> Se `type_1` for `"Cor"` ou `"Color"`, a API resolve a cor (`color_id`)
+> automaticamente a partir de `value_1`.
 
 ## Herança de Dados
 
@@ -92,19 +103,36 @@ A plataforma Tray impõe um limite de variações por produto. Consulte a seçã
 
 ## Corpo da Requisição (POST/PUT)
 
+Cada combinação de atributos é **uma** variação = **uma** chamada `POST /variants`:
+
 ```json
 {
   "Variant": {
     "product_id": 123,
-    "ean": "7891234567890",
+    "type_1": "Cor",
+    "value_1": "Azul",
+    "type_2": "Tamanho",
+    "value_2": "M",
     "price": "89.90",
     "stock": 50,
-    "values": [
-      {"name": "Cor", "value": "Azul"},
-      {"name": "Tamanho", "value": "M"}
-    ]
+    "ean": "7891234567890"
   }
 }
+```
+
+### Criar múltiplas variações
+
+Para um produto com várias combinações, faça **uma chamada por combinação**.
+Ex.: iPhone 15 nas cores Prata, Preto e Dourado, todos 256GB → 3 chamadas,
+variando apenas `value_1`:
+
+```json
+// Variação 1
+{ "Variant": { "product_id": 123, "type_1": "Cor", "value_1": "Prata",   "type_2": "Armazenamento", "value_2": "256GB" } }
+// Variação 2
+{ "Variant": { "product_id": 123, "type_1": "Cor", "value_1": "Preto",   "type_2": "Armazenamento", "value_2": "256GB" } }
+// Variação 3
+{ "Variant": { "product_id": 123, "type_1": "Cor", "value_1": "Dourado", "type_2": "Armazenamento", "value_2": "256GB" } }
 ```
 
 ## Paginação
@@ -127,14 +155,15 @@ As imagens de variação são gerenciadas pela API de Imagens separada (`POST /v
 ### O que o Claude faz
 
 1. Gera o código com o wrapper `Variant` e o `product_id` do produto pai
-2. Monta o array `values` com os atributos (cor, tamanho, modelo, etc.)
+2. Define os atributos em campos planos `type_1`/`value_1` (e `type_2`/`value_2` se houver 2 eixos)
 3. Define campos individuais da variação (preço, estoque, EAN) quando necessário
-4. Explica a herança de dados do produto pai para campos não informados
+4. Gera uma chamada por combinação de atributos quando há múltiplas variações
+5. Explica a herança de dados do produto pai para campos não informados
 
 ### O que você recebe
 
 - Código de criação de variação com wrapper `{"Variant": {...}}` correto
-- Array `values` montado com os atributos desejados
+- Atributos nos campos `type_1`/`value_1` e `type_2`/`value_2` (nunca array `values`)
 - Lógica de herança explicada (quais campos herdam do produto pai)
 - Exemplo de listagem por `product_id`
 

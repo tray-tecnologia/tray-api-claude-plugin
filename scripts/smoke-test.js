@@ -250,7 +250,7 @@ const validateSkills = {
     'webhook.payload': '{"Webhook":{"seller_id":1,"scope_id":1,"scope_name":"order","act":"insert"}}',
   },
   variacoes: {
-    'variacao.create': '{"Variant":{"sku":"X","price":1}}',
+    'variacao.create': '{"Variant":{"product_id":1,"type_1":"Cor","value_1":"Azul","price":1}}',
     'variacao.update': '{"Variant":{"price":2}}',
   },
   categorias: {
@@ -258,7 +258,7 @@ const validateSkills = {
     'categoria.update': '{"Category":{"name":"Y"}}',
   },
   marcas: {
-    'marca.create': '{"Brand":{"name":"Nike"}}',
+    'marca.create': '{"Brand":{"brand":"Nike"}}',
     'marca.update': '{"Brand":{"slug":"nike"}}',
   },
 };
@@ -300,7 +300,7 @@ const invalidPayloads = {
     'webhook.payload': ['{"Webhook":{"seller_id":1,"scope_id":1,"scope_name":"order"}}', 'falta act'],
   },
   variacoes: {
-    'variacao.create': ['{"Variant":{"sku":"X"}}', 'falta price'],
+    'variacao.create': ['{"Variant":{"price":1}}', 'faltam product_id/type_1/value_1'],
     'variacao.update': ['{"Variant":{"price":-1}}', 'price negativo'],
   },
   categorias: {
@@ -308,7 +308,7 @@ const invalidPayloads = {
     'categoria.update': ['{"Category":{"parent_id":"1"}}', 'parent_id string'],
   },
   marcas: {
-    'marca.create': ['{"Brand":{}}', 'falta name'],
+    'marca.create': ['{"Brand":{}}', 'falta brand'],
     'marca.update': ['{"Brand":{"slug":"with space"}}', 'slug com espaço'],
   },
 };

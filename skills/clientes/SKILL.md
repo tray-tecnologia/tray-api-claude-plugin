@@ -67,20 +67,26 @@ Documentação oficial: https://developers.tray.com.br/#api-de-clientes
 
 ## Campos do Cliente
 
-| Campo | Tipo | Descrição |
-|:--|:--|:--|
-| `name` | string | Nome completo |
-| `email` | string | E-mail (obrigatório, único) |
-| `cpf` | string | CPF (pessoa física) |
-| `cnpj` | string | CNPJ (pessoa jurídica) |
-| `rg` | string | RG |
-| `phone` | string | Telefone fixo |
-| `cellphone` | string | Celular |
-| `birth_date` | date | Data de nascimento (YYYY-MM-DD) |
-| `gender` | string | Gênero |
-| `company_name` | string | Razão social (PJ) |
-| `newsletter` | number | 0=não inscrito, 1=inscrito na newsletter |
-| `created_at` | datetime | Data de cadastro |
+| Campo | Tipo | Obrigatório (create) | Descrição |
+|:--|:--|:--|:--|
+| `name` | string | **Sim** | Nome completo |
+| `email` | string | **Sim** | E-mail (único na plataforma) |
+| `birth_date` | date | **Sim** | Data de nascimento (YYYY-MM-DD) |
+| `cpf` | string | Não¹ | CPF (pessoa física) |
+| `cnpj` | string | Não¹ | CNPJ (pessoa jurídica) |
+| `rg` | string | Não | RG |
+| `phone` | string | Não | Telefone fixo |
+| `cellphone` | string | Não | Celular |
+| `gender` | string | Não | Gênero |
+| `company_name` | string | Não | Razão social (PJ) |
+| `newsletter` | number | Não | 0=não inscrito, 1=inscrito na newsletter |
+| `created_at` | datetime | — | Data de cadastro (retornado pela API) |
+
+> ⚠️ **`birth_date` é obrigatório na criação** (`POST /customers`). Omitir
+> resulta em HTTP 400 — é a causa #1 de falha ao cadastrar cliente.
+>
+> ¹ `cpf` (PF) ou `cnpj` (PJ) conforme o tipo de cliente; informe o que
+> corresponder à pessoa.
 
 ## Validações Brasileiras
 
@@ -94,6 +100,7 @@ Documentação oficial: https://developers.tray.com.br/#api-de-clientes
   "Customer": {
     "name": "João Silva",
     "email": "joao@exemplo.com",
+    "birth_date": "1990-05-20",
     "cpf": "12345678901",
     "phone": "1133334444",
     "cellphone": "11999998888",

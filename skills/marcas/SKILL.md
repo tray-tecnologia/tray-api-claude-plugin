@@ -3,8 +3,8 @@ name: tray-marcas
 description: >
   API de Marcas da Tray. Utilize quando o desenvolvedor precisar gerenciar
   as marcas (fabricantes) dos produtos da loja, incluindo listagem, consulta individual,
-  criação, atualização e exclusão. Inclui campos de nome, slug, descrição e imagem
-  da marca, além de paginação e filtros.
+  criação, atualização e exclusão. Inclui os campos da marca (brand, slug),
+  paginação e filtros.
 when_to_use: >
   Use quando o desenvolvedor mencionar: marca, fabricante, brand, GET /brands,
   POST /brands, PUT /brands, brand_id, filtrar por marca ou cadastrar fabricante.
@@ -71,10 +71,13 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
 | Campo | Tipo | Obrigatório | Descrição |
 |:--|:--|:--|:--|
 | `id` | number | — | ID da marca (retornado pela API) |
-| `name` | string | Sim | Nome da marca |
+| `brand` | string | **Sim** | Nome da marca |
 | `slug` | string | Não | Slug para URL amigável (gerado automaticamente se não informado) |
-| `description` | string | Não | Descrição da marca |
-| `image` | string | Não | URL da imagem/logotipo da marca |
+
+> ⚠️ **O campo do nome da marca é `brand`, NÃO `name`.** Enviar `name` resulta
+> em `"Invalid data provided"` (HTTP 400) — a API ignora o campo desconhecido e
+> falha por `brand` ausente. Os campos aceitos no payload são apenas `brand` e
+> `slug`. Os campos `description` e `image` **não** existem nesta API de marcas.
 
 ## Paginação
 
@@ -90,18 +93,15 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
 | Filtro | Tipo | Descrição |
 |:--|:--|:--|
 | `id` | number | Filtrar por ID da marca |
-| `name` | string | Filtrar por nome da marca |
-| `slug` | string | Filtrar por slug |
+| `brand` | string | Filtrar por nome da marca |
 
 ## Corpo da Requisição (POST/PUT)
 
 ```json
 {
   "Brand": {
-    "name": "Nike",
-    "slug": "nike",
-    "description": "Marca esportiva internacional",
-    "image": "https://exemplo.com/logo-nike.png"
+    "brand": "Nike",
+    "slug": "nike"
   }
 }
 ```
@@ -129,10 +129,8 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
     {
       "Brand": {
         "id": "1",
-        "name": "Nike",
-        "slug": "nike",
-        "description": "Marca esportiva internacional",
-        "image": "https://exemplo.com/logo-nike.png"
+        "brand": "Nike",
+        "slug": "nike"
       }
     }
   ]
@@ -145,10 +143,8 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
 {
   "Brand": {
     "id": "1",
-    "name": "Nike",
-    "slug": "nike",
-    "description": "Marca esportiva internacional",
-    "image": "https://exemplo.com/logo-nike.png"
+    "brand": "Nike",
+    "slug": "nike"
   }
 }
 ```
@@ -158,28 +154,28 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
 1. **Crie marcas antes dos produtos** — ao cadastrar produtos, o `brand_id` deve referenciar uma marca existente
 2. **Use slugs descritivos** — o slug é usado na URL da página de marca na vitrine; mantenha-o limpo e legível
 3. **Evite duplicidade** — consulte a listagem antes de criar para evitar marcas duplicadas
-4. **Imagem da marca** — forneça uma URL pública e acessível para o logotipo; formatos recomendados: PNG ou JPG
+4. **Campo correto** — use sempre `brand` para o nome da marca; `name` é ignorado e causa erro
 5. **Exclusão segura** — não exclua marcas que possuam produtos associados; reatribua os produtos antes
 
 ## Como Usar no Claude Code
 
 ### Exemplos de Prompt
 
-- "cadastra as marcas Nike, Adidas e Puma com seus logos"
+- "cadastra as marcas Nike, Adidas e Puma"
 - "lista todas as marcas disponíveis na loja"
 - "verifica se a marca Samsung já existe antes de criar"
-- "atualiza o logo e a descrição da marca ID 10"
+- "atualiza o slug da marca ID 10"
 
 ### O que o Claude faz
 
-1. Gera o código de criação com wrapper `Brand` e slug automático
-2. Inclui verificação de duplicidade via `GET /products/brands?name=...` antes de criar
-3. Monta o payload com nome, slug, descrição e URL do logo
+1. Gera o código de criação com wrapper `Brand`, usando o campo `brand` (e slug automático)
+2. Inclui verificação de duplicidade via `GET /products/brands?brand=...` antes de criar
+3. Monta o payload apenas com os campos aceitos (`brand`, `slug`)
 4. Explica que o `brand_id` retornado deve ser usado ao cadastrar produtos
 
 ### O que você recebe
 
-- Código de criação de marca com wrapper `{"Brand": {...}}` correto
+- Código de criação de marca com wrapper `{"Brand": {...}}` correto e campo `brand`
 - Verificação de duplicidade antes de criar
 - `brand_id` extraído da resposta para uso em produtos
 - Código de listagem com paginação
@@ -187,4 +183,3 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
 ### Pré-requisitos
 
 - `access_token` configurado
-- URLs públicas dos logos (opcional, mas recomendado)

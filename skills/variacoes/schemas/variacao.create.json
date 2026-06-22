@@ -1,9 +1,30 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Variant",
-  "description": "Payload de criação de variação via POST /products/:id/variants. Aceita reference OU sku como identificador (ambos opcionais; se nenhum for enviado, a Tray gera). Doc: https://developers.tray.com.br/#api-de-variacoes-de-produtos",
+  "description": "Payload de criação de variação via POST /variants. Atributos em campos planos type_1/value_1 (e type_2/value_2 se houver 2 eixos); type_1/value_1 obrigatórios. Doc: https://developers.tray.com.br/#api-de-variacoes-de-produtos",
   "type": "object",
   "properties": {
+    "product_id": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "ID do produto pai."
+    },
+    "type_1": {
+      "type": "string",
+      "description": "Nome do 1º atributo (ex: Cor). Obrigatório no create."
+    },
+    "value_1": {
+      "type": "string",
+      "description": "Valor do 1º atributo (ex: Azul). Obrigatório no create."
+    },
+    "type_2": {
+      "type": "string",
+      "description": "Nome do 2º atributo (ex: Tamanho). Obrigatório se value_2 presente."
+    },
+    "value_2": {
+      "type": "string",
+      "description": "Valor do 2º atributo (ex: M). Obrigatório se type_2 presente."
+    },
     "reference": {
       "type": "string",
       "description": "Referência interna da variação (alternativa ao sku)."
@@ -15,12 +36,27 @@
     "price": {
       "type": "number",
       "minimum": 0,
-      "description": "Preço de venda em reais."
+      "description": "Preço de venda em reais. Herda do produto pai se omitido."
+    },
+    "cost_price": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Preço de custo."
+    },
+    "promotional_price": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Preço promocional."
     },
     "stock": {
       "type": "integer",
       "minimum": 0,
       "description": "Quantidade em estoque desta variação."
+    },
+    "minimum_stock": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Estoque mínimo."
     },
     "ean": {
       "type": "string",
@@ -30,8 +66,9 @@
     "weight": { "type": "number", "minimum": 0 },
     "length": { "type": "number", "minimum": 0 },
     "width": { "type": "number", "minimum": 0 },
-    "height": { "type": "number", "minimum": 0 }
+    "height": { "type": "number", "minimum": 0 },
+    "cubic_weight": { "type": "number", "minimum": 0 }
   },
-  "required": ["price"],
+  "required": ["product_id", "type_1", "value_1"],
   "additionalProperties": false
 }

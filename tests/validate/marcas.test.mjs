@@ -8,25 +8,25 @@ import update from '../../skills/marcas/schemas/marca.update.json' with { type: 
 describe('marcas — marca.create', () => {
   const v = (p) => validatePayload(create, p);
 
-  test('válido — só name', () => assert.deepEqual(v({ name: 'Nike' }), []));
-  test('válido — com slug válido', () => assert.deepEqual(v({ name: 'Nike', slug: 'nike-air' }), []));
-  test('válido — com slug numérico', () => assert.deepEqual(v({ name: 'X', slug: '123-abc' }), []));
-  test('válido — com active', () => assert.deepEqual(v({ name: 'X', active: 1 }), []));
-  test('inválido — falta name', () => assert.equal(v({}).length, 1));
+  test('válido — só brand', () => assert.deepEqual(v({ brand: 'Nike' }), []));
+  test('válido — com slug válido', () => assert.deepEqual(v({ brand: 'Nike', slug: 'nike-air' }), []));
+  test('válido — com slug numérico', () => assert.deepEqual(v({ brand: 'X', slug: '123-abc' }), []));
+  test('válido — com active', () => assert.deepEqual(v({ brand: 'X', active: 1 }), []));
+  test('inválido — falta brand', () => assert.equal(v({}).length, 1));
   test('inválido — slug com espaço', () => {
-    const errs = v({ name: 'X', slug: 'nike air' });
+    const errs = v({ brand: 'X', slug: 'nike air' });
     assert.equal(errs.length, 1);
     assert.match(errs[0].message, /pattern/);
   });
   test('inválido — slug com maiúscula', () => {
-    assert.equal(v({ name: 'X', slug: 'Nike' }).length, 1);
+    assert.equal(v({ brand: 'X', slug: 'Nike' }).length, 1);
   });
-  test('inválido — extra', () => assert.equal(v({ name: 'X', extra: 1 }).length, 1));
+  test('inválido — extra', () => assert.equal(v({ brand: 'X', extra: 1 }).length, 1));
   test('oracle: slug válido', () => {
-    assertOracleAgrees(create, { name: 'X', slug: 'a-b-c' }, validatePayload);
+    assertOracleAgrees(create, { brand: 'X', slug: 'a-b-c' }, validatePayload);
   });
   test('oracle: slug inválido', () => {
-    assertOracleAgrees(create, { name: 'X', slug: 'A B C' }, validatePayload);
+    assertOracleAgrees(create, { brand: 'X', slug: 'A B C' }, validatePayload);
   });
 });
 
@@ -36,5 +36,5 @@ describe('marcas — marca.update', () => {
   test('válido — só slug', () => assert.deepEqual(v({ slug: 'novo-slug' }), []));
   test('válido — vazio', () => assert.deepEqual(v({}), []));
   test('inválido — slug com espaço', () => assert.equal(v({ slug: 'a b' }).length, 1));
-  test('inválido — extra', () => assert.equal(v({ name: 'X', extra: 1 }).length, 1));
+  test('inválido — extra', () => assert.equal(v({ brand: 'X', extra: 1 }).length, 1));
 });

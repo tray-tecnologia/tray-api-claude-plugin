@@ -1,18 +1,26 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Variant",
-  "description": "Payload de atualização parcial de variação via PUT /products/:id/variants/:variant_id.",
+  "description": "Payload de atualização parcial de variação via PUT /variants/:id. Atributos em campos planos type_1/value_1 e type_2/value_2 (todos opcionais no update).",
   "type": "object",
   "properties": {
+    "type_1": { "type": "string" },
+    "value_1": { "type": "string" },
+    "type_2": { "type": "string" },
+    "value_2": { "type": "string" },
     "reference": { "type": "string" },
     "sku": { "type": "string" },
     "price": { "type": "number", "minimum": 0 },
+    "cost_price": { "type": "number", "minimum": 0 },
+    "promotional_price": { "type": "number", "minimum": 0 },
     "stock": { "type": "integer", "minimum": 0 },
+    "minimum_stock": { "type": "integer", "minimum": 0 },
     "ean": { "type": "string", "format": "ean" },
     "weight": { "type": "number", "minimum": 0 },
     "length": { "type": "number", "minimum": 0 },
     "width": { "type": "number", "minimum": 0 },
-    "height": { "type": "number", "minimum": 0 }
+    "height": { "type": "number", "minimum": 0 },
+    "cubic_weight": { "type": "number", "minimum": 0 }
   },
   "additionalProperties": false
 }

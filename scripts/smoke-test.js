@@ -243,7 +243,7 @@ const validateSkills = {
     'pedido.update': '{"Order":{"status_id":5}}',
   },
   clientes: {
-    'cliente.create': '{"Customer":{"name":"A","email":"a@b.com"}}',
+    'cliente.create': '{"Customer":{"name":"A","email":"a@b.com","birth_date":"1990-05-20"}}',
     'cliente.update': '{"Customer":{"email":"novo@x.com"}}',
   },
   webhooks: {

@@ -9,64 +9,70 @@ import * as fx from './helpers/fixtures.mjs';
 describe('clientes — cliente.create', () => {
   const v = (p) => validatePayload(create, p);
 
-  test('válido — name + email', () => {
-    assert.deepEqual(v({ name: 'Ana', email: 'ana@x.com' }), []);
+  const BD = '1990-05-20'; // birth_date é obrigatório no create
+
+  test('válido — name + email + birth_date', () => {
+    assert.deepEqual(v({ name: 'Ana', email: 'ana@x.com', birth_date: BD }), []);
   });
 
   test('válido — com CPF correto', () => {
-    assert.deepEqual(v({ name: 'Ana', email: 'ana@x.com', cpf: fx.CPFS_VALIDOS[0] }), []);
+    assert.deepEqual(v({ name: 'Ana', email: 'ana@x.com', birth_date: BD, cpf: fx.CPFS_VALIDOS[0] }), []);
   });
 
   test('válido — com CNPJ correto', () => {
-    assert.deepEqual(v({ name: 'ACME', email: 'a@b.com', cnpj: fx.CNPJS_VALIDOS[0] }), []);
+    assert.deepEqual(v({ name: 'ACME', email: 'a@b.com', birth_date: BD, cnpj: fx.CNPJS_VALIDOS[0] }), []);
   });
 
   test('válido — email com subdomínio', () => {
-    assert.deepEqual(v({ name: 'Ana', email: 'ana@sub.dom.com.br' }), []);
+    assert.deepEqual(v({ name: 'Ana', email: 'ana@sub.dom.com.br', birth_date: BD }), []);
   });
 
   test('válido — com gender', () => {
-    assert.deepEqual(v({ name: 'Ana', email: 'a@b.com', gender: 'F' }), []);
+    assert.deepEqual(v({ name: 'Ana', email: 'a@b.com', birth_date: BD, gender: 'F' }), []);
   });
 
   test('inválido — falta name', () => {
-    assert.equal(v({ email: 'a@b.com' }).length, 1);
+    assert.equal(v({ email: 'a@b.com', birth_date: BD }).length, 1);
   });
 
   test('inválido — falta email', () => {
-    assert.equal(v({ name: 'A' }).length, 1);
+    assert.equal(v({ name: 'A', birth_date: BD }).length, 1);
+  });
+
+  test('inválido — falta birth_date', () => {
+    assert.equal(v({ name: 'A', email: 'a@b.com' }).length, 1);
   });
 
   test('inválido — email malformado', () => {
-    const errs = v({ name: 'A', email: 'sem-arroba' });
+    const errs = v({ name: 'A', email: 'sem-arroba', birth_date: BD });
     assert.equal(errs.length, 1);
     assert.match(errs[0].message, /Email inválido/);
   });
 
   test('inválido — CPF "111"', () => {
-    const errs = v({ name: 'A', email: 'a@b.com', cpf: '111' });
+    const errs = v({ name: 'A', email: 'a@b.com', birth_date: BD, cpf: '111' });
     assert.equal(errs.length, 1);
     assert.match(errs[0].message, /CPF inválido/);
   });
 
   test('inválido — CPF todos zeros', () => {
-    assert.equal(v({ name: 'A', email: 'a@b.com', cpf: '00000000000' }).length, 1);
+    assert.equal(v({ name: 'A', email: 'a@b.com', birth_date: BD, cpf: '00000000000' }).length, 1);
   });
 
   test('inválido — CNPJ DV errado', () => {
-    assert.equal(v({ name: 'A', email: 'a@b.com', cnpj: fx.CNPJS_INVALIDOS[3] }).length, 1);
+    assert.equal(v({ name: 'A', email: 'a@b.com', birth_date: BD, cnpj: fx.CNPJS_INVALIDOS[3] }).length, 1);
   });
 
   test('inválido — gender fora do enum', () => {
-    assert.equal(v({ name: 'A', email: 'a@b.com', gender: 'X' }).length, 1);
+    assert.equal(v({ name: 'A', email: 'a@b.com', birth_date: BD, gender: 'X' }).length, 1);
   });
 
   test('inválido — campo extra', () => {
-    assert.equal(v({ name: 'A', email: 'a@b.com', extra: 1 }).length, 1);
+    assert.equal(v({ name: 'A', email: 'a@b.com', birth_date: BD, extra: 1 }).length, 1);
   });
 
   test('oracle: válido', () => {
-    assertOracleAgrees(create, { name: 'A', email: 'a@b.com' }, validatePayload);
+    assertOracleAgrees(create, { name: 'A', email: 'a@b.com', birth_date: BD }, validatePayload);
   });
 
   test('oracle: falta required', () => {

@@ -44,6 +44,6 @@
       "description": "1 = aceita receber newsletter."
     }
   },
-  "required": ["name", "email"],
+  "required": ["name", "email", "birth_date"],
   "additionalProperties": false
 }

@@ -7,6 +7,14 @@
 - **Licença migrada de GPL-3.0 para MIT.** Aplica-se a versões futuras; cópias previamente distribuídas mantêm os termos GPL-3.0 originais. Atualizados `LICENSE`, badge e seções de licença em `README.md`, `CONTRIBUTING.md` e o campo `license` em `package.json`, `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `.cursor-plugin/plugin.json` e `.codex-plugin/plugin.json`. Decisão alinhada com o padrão permissivo adotado por toolkits de IA de referência (ex.: Shopify/Shopify-AI-Toolkit)
 - **Repositório renomeado de `tray-api-claude-plugin` para `tray-api-ai-plugin`** para refletir compatibilidade multi-plataforma (Claude Code, Cursor, Codex, Gemini CLI, GitHub Copilot, JetBrains AI, Windsurf). Comandos de instalação atualizados em `README.md`, `CONTRIBUTING.md` e `SECURITY.md`. Campo `repository` atualizado nos cinco manifests de plugin. Nome do pacote npm (`@tray-tecnologia/tray-api-plugin`) e ID do plugin (`tray-api`) **não foram alterados**, preservando comandos como `npm install @tray-tecnologia/tray-api-plugin` e `/plugin install tray-api@tray-plugins`. `scripts/cleanup-plugin-installations.sh` reconhece ambos os nomes durante a transição. URLs antigas continuam funcionando via redirect permanente do GitHub
 
+### Corrigido
+
+- **Schema de produto (`produto.create`/`produto.update`): campo `price` agora aceita `number` ou string decimal** (ex.: `"49.90"`). A API Tray retorna e aceita o preço como string, e os próprios exemplos da doc (`docs/CENARIOS-DE-TESTE.md`, cenários 1.2/3.1) usam string — o schema anterior (`type: number`) rejeitava esses payloads válidos. Validação por `pattern` mantém strings não-numéricas (ex.: `"abc"`) inválidas. Testes de `produtos` atualizados. Verificado contra a API real.
+
+### Removido
+
+- `scripts/test-prompt-matcher.mjs` — script órfão que validava o `matcher` do hook `UserPromptSubmit`. O hook foi descontinuado (não existe em `hooks/hooks.json`; blocos 4–6 de `docs/CENARIOS-DE-TESTE.md` já marcados como descontinuados), então o script falhava com `TypeError: Cannot read properties of undefined (reading '0')`. Não era referenciado por `package.json` nem CI.
+
 ## [2.1.0] - 2026-06-17
 
 ### Adicionado

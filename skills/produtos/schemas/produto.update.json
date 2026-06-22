@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "name": { "type": "string", "maxLength": 255 },
-    "price": { "type": "number", "minimum": 0 },
+    "price": { "type": ["number", "string"], "minimum": 0, "pattern": "^[0-9]+(\\.[0-9]{1,2})?$" },
     "description": { "type": "string" },
     "stock": { "type": "integer", "minimum": 0 },
     "ean": { "type": "string", "format": "ean" },

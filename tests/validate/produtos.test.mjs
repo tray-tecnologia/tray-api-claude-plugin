@@ -47,8 +47,12 @@ describe('produtos — produto.create', () => {
     assert.match(errs[0].message, /price.*>= 0/);
   });
 
-  test('inválido — price string', () => {
-    assert.equal(v({ name: 'C', price: '49.90' }).length, 1);
+  test('válido — price string decimal (API Tray retorna/aceita string)', () => {
+    assert.deepEqual(v({ name: 'C', price: '49.90' }), []);
+  });
+
+  test('inválido — price string não-numérica', () => {
+    assert.equal(v({ name: 'C', price: 'abc' }).length, 1);
   });
 
   test('inválido — name excede 255 chars', () => {
@@ -97,8 +101,12 @@ describe('produtos — produto.update', () => {
     assert.deepEqual(v({ name: 'X', price: 1, stock: 10 }), []);
   });
 
-  test('inválido — type errado', () => {
-    assert.equal(v({ price: '99' }).length, 1);
+  test('válido — price string decimal', () => {
+    assert.deepEqual(v({ price: '99' }), []);
+  });
+
+  test('inválido — price string não-numérica', () => {
+    assert.equal(v({ price: 'abc' }).length, 1);
   });
 
   test('inválido — price negativo', () => {

@@ -10,9 +10,10 @@
       "description": "Nome do produto."
     },
     "price": {
-      "type": "number",
+      "type": ["number", "string"],
       "minimum": 0,
-      "description": "Preço de venda em reais (use ponto decimal, não vírgula)."
+      "pattern": "^[0-9]+(\\.[0-9]{1,2})?$",
+      "description": "Preço de venda em reais (ponto decimal, não vírgula). Aceita number (49.90) ou string decimal (\"49.90\") — a API Tray retorna e aceita o preço como string."
     },
     "description": {
       "type": "string",

@@ -1,0 +1,11 @@
+{
+  "Invoice": {
+    "number": "000123456",
+    "series": "1",
+    "issue_date": "2026-03-21",
+    "key": "35260312345678000100550010001234561234567890",
+    "cfop": "5102",
+    "link": "https://exemplo.com/danfe/123456.pdf",
+    "total_amount": "299.90"
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DiscountCoupon",
+  "description": "Payload de criação de cupom de desconto via POST /discount_coupons. Wrapper de recurso: DiscountCoupon. Doc: https://developers.tray.com.br/#api-de-cupons-de-desconto. NÃO-VERIFICADO contra sandbox — validar antes do merge.",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "pattern": "^[^\\s]+$",
+      "description": "Código do cupom digitado no checkout. Não aceita espaços nem acentos; único por loja (ex.: PROMO10)."
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "$",
+        "%"
+      ],
+      "description": "Tipo de desconto: '$' para valor fixo em reais, '%' para percentual. Determina como 'value' é interpretado."
+    },
+    "value": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Valor do desconto. Reais quando type='$', porcentagem quando type='%' (ex.: 10.00)."
+    },
+    "description": {
+      "type": "string",
+      "description": "Descrição interna/administrativa do cupom (ex.: nome da campanha)."
+    },
+    "coupon_type": {
+      "type": "string",
+      "enum": [
+        "loja",
+        "cliente",
+        "troca",
+        "presente"
+      ],
+      "description": "Abrangência/comportamento: loja (genérico), cliente (restrito a clientes vinculados), troca (gerado de order_id), presente (entrega brinde)."
+    },
+    "local_application": {
+      "type": "string",
+      "enum": [
+        "loja",
+        "produtos",
+        "marcas",
+        "categorias"
+      ],
+      "description": "Escopo de aplicação do desconto. Indica qual endpoint de relacionamento (product/category/brand) usar."
+    },
+    "freight_application": {
+      "type": "string",
+      "enum": [
+        "nao_aplicavel",
+        "desconto",
+        "frete_gratis"
+      ],
+      "description": "Comportamento quanto ao frete: nao_aplicavel, desconto (reduz frete) ou frete_gratis (zera frete)."
+    },
+    "starts_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de início da validade no formato YYYY-MM-DD (horário de Brasília)."
+    },
+    "ends_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de fim da validade no formato YYYY-MM-DD. Após essa data o cupom expira."
+    },
+    "value_start": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Valor mínimo (faixa inferior) de produto/pedido elegível ao desconto. Omitir = sem restrição."
+    },
+    "value_end": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Valor máximo (faixa superior) de produto/pedido elegível ao desconto. Omitir = sem restrição."
+    },
+    "usage_sum_limit": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Limite total acumulado de uso (soma de valores) do cupom."
+    },
+    "usage_counter_limit": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Limite total de usos somando todos os clientes. Deve ser >= usage_counter_limit_customer; 0/omitido tende a indicar ilimitado."
+    },
+    "usage_counter_limit_customer": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Limite de usos por cliente individual. Deve ser <= usage_counter_limit."
+    },
+    "cumulative_discount": {
+      "type": "integer",
+      "enum": [
+        0,
+        1
+      ],
+      "description": "Acumula com desconto progressivo/outros descontos? 1 = acumulativo, 0 = exclusivo (não empilha)."
+    }
+  },
+  "required": [
+    "code",
+    "type",
+    "value"
+  ],
+  "additionalProperties": false
+}

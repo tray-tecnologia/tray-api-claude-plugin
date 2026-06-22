@@ -79,7 +79,13 @@ Após o lojista autorizar, a Tray redireciona para sua `callback` com os parâme
 | `code` | Código de autorização (uso único) |
 | `adm_user` | Identificador do usuário administrativo |
 | `store` | URL da loja |
-| `api_address` | Endereço base da API para esta loja |
+| `api_address` | Endereço base da API para esta loja — **já inclui o sufixo `/web_api`** (ex.: `urldaloja.com.br/web_api`). |
+
+> **`api_address` contém `/web_api`.** Conforme a doc oficial, `api_address` é o
+> domínio da loja **+ `/web_api`** (ex.: `urldaloja.com.br/web_api`). A URL final
+> fica `https://{api_address}/<recurso>` = `https://urldaloja.com.br/web_api/<recurso>`.
+> Armazene o `api_address` exatamente como veio do callback; remover o `/web_api`
+> (guardar só `urldaloja.com.br`) causa `HTTP 404` em todas as chamadas.
 
 ### Etapa 3 — Gerar Chaves de Acesso
 

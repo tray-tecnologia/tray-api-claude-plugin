@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DiscountCoupon",
+  "description": "Payload de atualização parcial de cupom via PUT /discount_coupons/:id. Wrapper de recurso: DiscountCoupon. Todos os campos opcionais (envia-se só o que muda). Doc: https://developers.tray.com.br/#api-de-cupons-de-desconto. NÃO-VERIFICADO contra sandbox — validar antes do merge.",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "pattern": "^[^\\s]+$",
+      "description": "Código do cupom. Não aceita espaços nem acentos; único por loja."
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "$",
+        "%"
+      ],
+      "description": "Tipo de desconto: '$' valor fixo em reais, '%' percentual."
+    },
+    "value": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Valor do desconto, interpretado conforme 'type'."
+    },
+    "description": {
+      "type": "string",
+      "description": "Descrição interna/administrativa do cupom."
+    },
+    "coupon_type": {
+      "type": "string",
+      "enum": [
+        "loja",
+        "cliente",
+        "troca",
+        "presente"
+      ],
+      "description": "Abrangência/comportamento do cupom."
+    },
+    "local_application": {
+      "type": "string",
+      "enum": [
+        "loja",
+        "produtos",
+        "marcas",
+        "categorias"
+      ],
+      "description": "Escopo de aplicação do desconto."
+    },
+    "freight_application": {
+      "type": "string",
+      "enum": [
+        "nao_aplicavel",
+        "desconto",
+        "frete_gratis"
+      ],
+      "description": "Comportamento quanto ao frete."
+    },
+    "starts_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de início da validade no formato YYYY-MM-DD."
+    },
+    "ends_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de fim da validade no formato YYYY-MM-DD. Ajustar ends_at é preferível a DELETE para desativar campanha (preserva histórico)."
+    },
+    "value_start": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Valor mínimo de produto/pedido elegível. Omitir = sem restrição."
+    },
+    "value_end": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Valor máximo de produto/pedido elegível. Omitir = sem restrição."
+    },
+    "usage_sum_limit": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Limite total acumulado de uso (soma de valores)."
+    },
+    "usage_counter_limit": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Limite total de usos. Deve ser >= usage_counter_limit_customer."
+    },
+    "usage_counter_limit_customer": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Limite de usos por cliente. Deve ser <= usage_counter_limit."
+    },
+    "cumulative_discount": {
+      "type": "integer",
+      "enum": [
+        0,
+        1
+      ],
+      "description": "1 = acumulativo, 0 = exclusivo."
+    }
+  },
+  "additionalProperties": false
+}

@@ -7,6 +7,23 @@
 - **Licença migrada de GPL-3.0 para MIT.** Aplica-se a versões futuras; cópias previamente distribuídas mantêm os termos GPL-3.0 originais. Atualizados `LICENSE`, badge e seções de licença em `README.md`, `CONTRIBUTING.md` e o campo `license` em `package.json`, `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `.cursor-plugin/plugin.json` e `.codex-plugin/plugin.json`. Decisão alinhada com o padrão permissivo adotado por toolkits de IA de referência (ex.: Shopify/Shopify-AI-Toolkit)
 - **Repositório renomeado de `tray-api-claude-plugin` para `tray-api-ai-plugin`** para refletir compatibilidade multi-plataforma (Claude Code, Cursor, Codex, Gemini CLI, GitHub Copilot, JetBrains AI, Windsurf). Comandos de instalação atualizados em `README.md`, `CONTRIBUTING.md` e `SECURITY.md`. Campo `repository` atualizado nos cinco manifests de plugin. Nome do pacote npm (`@tray-tecnologia/tray-api-plugin`) e ID do plugin (`tray-api`) **não foram alterados**, preservando comandos como `npm install @tray-tecnologia/tray-api-plugin` e `/plugin install tray-api@tray-plugins`. `scripts/cleanup-plugin-installations.sh` reconhece ambos os nomes durante a transição. URLs antigas continuam funcionando via redirect permanente do GitHub
 
+## [2.1.0] - 2026-06-17
+
+### Adicionado
+
+- `docs/skill-template.md` — template de SKILL.md denso (endpoints com exemplos curl+Node, edge cases, antipadrões, state machine, glossário) usado para aprofundar skills estratégicas (issue #100, P2.1).
+- Regra **R7** no linter (`scripts/lint-skills.mjs`): skills em `DENSE_SKILLS` exigem SKILL.md com no mínimo 800 linhas. +5 testes.
+- Schemas embarcados em `schemas/` para 5 recursos: `cupons` (discount_coupons.create/update), `multicd` (distribution_center.create/update), `pagamentos` (payment.create/update), `frete` (shippings.cotation), `status-pedido` (order_status.update).
+
+### Mudado
+
+- 5 skills aprofundadas para densidade comparável ao benchmark Shopify (todas > 800 linhas): `cupons` (332→1006), `multicd` (287→833), `pagamentos` (290→823), `frete` (189→897), `status-pedido` (179→920).
+- State machines em mermaid adicionadas a `status-pedido` e `pagamentos`.
+
+### Notas
+
+- Exemplos curl/Node das skills aprofundadas estão marcados `NÃO-VERIFICADO contra sandbox` — devem ser executados contra a sandbox Tray antes do release final (critério de aceite da issue #100).
+
 ## [2.0.0] - 2026-05-05
 
 > Consolida as iterações internas de desenvolvimento 1.3.0–1.5.0 (não publicadas) desta linha, além do servidor MCP.

@@ -1,0 +1,10 @@
+{
+  "ShippingMethod": {
+    "name": "Transportadora Regional",
+    "active": 1,
+    "type": "custom",
+    "delivery_time": 5,
+    "additional_delivery_time": 2,
+    "free_shipping_value": "299.90"
+  }
+}

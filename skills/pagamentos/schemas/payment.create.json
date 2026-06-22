@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Payment",
+  "description": "Payload de criação de pagamento via POST /payments. Body envolto na chave de recurso Payment. Doc: https://developers.tray.com.br/#apis-de-informacoes-de-pagamento",
+  "type": "object",
+  "properties": {
+    "order_id": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "ID do pedido associado ao pagamento. Deve existir (ver tray-pedidos)."
+    },
+    "payment_method": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "Nome do método/gateway de pagamento (ex.: 'PagSeguro')."
+    },
+    "payment_type": {
+      "type": "string",
+      "enum": [
+        "credit_card",
+        "boleto",
+        "pix",
+        "transfer",
+        "deposit"
+      ],
+      "description": "Tipo de pagamento. Determina quais campos específicos se aplicam."
+    },
+    "amount": {
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]{1,2})?$",
+      "description": "Valor do pagamento. Decimal com ponto, ex.: '299.90'. Nunca usar vírgula ou separador de milhar."
+    },
+    "installments": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Número de parcelas (cartão de crédito). Deve respeitar max_installments de /payments/settings."
+    },
+    "installment_value": {
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]{1,2})?$",
+      "description": "Valor de cada parcela. Deve respeitar min_installment_value de /payments/settings. Decimal com ponto."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "processing",
+        "approved",
+        "refused",
+        "refunded",
+        "cancelled",
+        "chargeback"
+      ],
+      "description": "Status do pagamento."
+    },
+    "transaction_id": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "ID da transação no gateway; usado para conciliação Tray <-> gateway."
+    },
+    "card_brand": {
+      "type": "string",
+      "maxLength": 60,
+      "description": "Bandeira do cartão (ex.: Visa, Mastercard, Elo). Aplicável a credit_card."
+    },
+    "card_last_digits": {
+      "type": "string",
+      "pattern": "^[0-9]{4}$",
+      "description": "Últimos 4 dígitos do cartão. NUNCA armazenar o número completo (PCI-DSS). Aplicável a credit_card."
+    },
+    "boleto_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL do boleto para impressão. Aplicável a boleto."
+    },
+    "boleto_barcode": {
+      "type": "string",
+      "pattern": "^[0-9]+$",
+      "description": "Linha digitável / código de barras do boleto. Aplicável a boleto."
+    },
+    "pix_qrcode": {
+      "type": "string",
+      "description": "Payload/QR code do PIX (copia e cola, formato EMV). Aplicável a pix."
+    },
+    "pix_key": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "Chave PIX para pagamento. Aplicável a pix."
+    },
+    "paid_at": {
+      "type": "string",
+      "format": "datetime",
+      "description": "Data/hora da confirmação do pagamento. YYYY-MM-DD HH:MM:SS (horário de Brasília, sem timezone)."
+    }
+  },
+  "required": [
+    "order_id",
+    "payment_method",
+    "payment_type",
+    "amount"
+  ],
+  "additionalProperties": false
+}

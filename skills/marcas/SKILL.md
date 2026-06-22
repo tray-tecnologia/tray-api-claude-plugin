@@ -79,6 +79,12 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
 > falha por `brand` ausente. Os campos aceitos no payload são apenas `brand` e
 > `slug`. Os campos `description` e `image` **não** existem nesta API de marcas.
 
+> **Atenção (causa #1 de HTTP 400 neste recurso):** o campo do nome da marca é
+> `brand`, **não** `name`. Enviar `{"Brand": {"name": "Nike"}}` resulta em
+> `HTTP 400`. Confirmado contra a doc oficial: o body e a resposta usam `brand`
+> (ex.: `{"Brand": {"slug": "nike", "brand": "Nike"}}`), e o filtro de listagem
+> também é `brand` (não `name`).
+
 ## Paginação
 
 | Parâmetro | Descrição |

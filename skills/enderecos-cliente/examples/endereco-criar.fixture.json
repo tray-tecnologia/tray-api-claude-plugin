@@ -1,0 +1,15 @@
+{
+  "Address": {
+    "recipient": "João Silva",
+    "street": "Rua Augusta",
+    "number": "1500",
+    "complement": "Apto 42",
+    "neighborhood": "Consolação",
+    "city": "São Paulo",
+    "state": "SP",
+    "zipcode": "01304001",
+    "country": "Brasil",
+    "type": "delivery",
+    "is_default": 1
+  }
+}

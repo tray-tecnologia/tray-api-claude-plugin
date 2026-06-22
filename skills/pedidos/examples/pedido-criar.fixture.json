@@ -1,0 +1,11 @@
+{
+  "Order": {
+    "customer_id": 1,
+    "products": [
+      { "product_id": 123, "quantity": 2 }
+    ],
+    "shipping_method": "Correios PAC",
+    "shipping_cost": 25.90,
+    "payment_method": "pix"
+  }
+}

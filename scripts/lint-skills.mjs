@@ -1,34 +1,21 @@
 #!/usr/bin/env node
 /**
- * Lint de skills do plugin Tray.
+ * Linter de SKILL.md: valida bloco MANDATORY, ordem de seções e referências
+ * obrigatórias (search_docs, validate onde aplicável).
  *
- * Verifica as regras obrigatórias declaradas no CLAUDE.md:
+ * Uso:
+ *   node scripts/lint-skills.mjs              # varre cada SKILL.md em subpastas de skills/
+ *   node scripts/lint-skills.mjs <arquivo>    # um SKILL.md
  *
- *  1. Toda skill deve ter o bloco "## MANDATORY: Tool Call(s) Required Before
- *     Answering" IMEDIATAMENTE após o frontmatter.
- *  2. O bloco MANDATORY deve incluir chamada a
- *     `node skills/tray-dev/scripts/search_docs.mjs` (sempre).
- *  3. Skills de categoria A (com schema local) devem:
- *       - incluir, no bloco MANDATORY, chamada a
- *         `node skills/<recurso>/scripts/validate.mjs`;
- *       - ter o arquivo `scripts/validate.mjs`;
- *       - ter o arquivo `assets/schema.json` (JSON válido).
- *
- * Exit code: 0 = tudo conforme · 1 = uma ou mais violações.
- *
- * Uso: node scripts/lint-skills.mjs   (ou `npm run lint:skills`)
+ * Flags: --json (saída programática), --help
  */
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join, dirname, resolve, basename } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const __dir = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dir, '..');
-const SKILLS_DIR = join(ROOT, 'skills');
-
-// Skills de categoria A — com schema local (espelha CLAUDE.md).
-const CATEGORY_A = [
+export const SKIP_SKILLS = ['tray-dev', 'visao-geral'];
+export const VALIDATE_SKILLS = [
   'autorizacao',
   'produtos',
   'pedidos',
@@ -39,92 +26,279 @@ const CATEGORY_A = [
   'marcas',
 ];
 
-const SEARCH_DOCS_CALL = 'skills/tray-dev/scripts/search_docs.mjs';
-const MANDATORY_HEADING = '## MANDATORY: Tool Call(s) Required Before Answering';
+/**
+ * Skills aprofundadas (issue ai/tasks#100, P2.1). Têm piso de densidade:
+ * SKILL.md deve ter pelo menos MIN_DENSE_LINES linhas (regra R7).
+ *
+ * A lista cresceu conforme cada skill foi reescrita no template denso:
+ *   Fase 1: cupons (piloto).
+ *   Fase 2: multicd, pagamentos, frete, status-pedido.
+ * Todas as 5 skills priorizadas da #100 já atingiram o piso.
+ */
+export const DENSE_SKILLS = [
+  'cupons',
+  'multicd',
+  'pagamentos',
+  'frete',
+  'status-pedido',
+];
 
-let violations = 0;
-let checked = 0;
+/** Skills da #100 ainda na fila de aprofundamento (entram em DENSE_SKILLS ao atingir o piso). */
+export const PENDING_DENSE_SKILLS = [];
 
-function fail(skill, msg) {
-  console.error(`  ❌ ${skill} — ${msg}`);
-  violations++;
+export const MIN_DENSE_LINES = 800;
+
+const R1_HEADER =
+  /^## MANDATORY: Tool Calls? Required Before Answering$/gm;
+const R1_HEADER_SINGLE =
+  /^## MANDATORY: Tool Calls? Required Before Answering$/m;
+const ANTES_HEADER = /^## Antes de responder$/m;
+const NEXT_SECTION = /^## /m;
+
+const SEARCH_LITERAL = 'node skills/tray-dev/scripts/search_docs.mjs';
+const OBRIGATORIA_LITERAL = 'OBRIGATÓRIA';
+
+/**
+ * @param {string} skillsRoot diretório `skills` (contém pastas por recurso)
+ * @returns {string[]} paths absolutos para cada `SKILL.md`
+ */
+export function findSkillFiles(skillsRoot) {
+  const out = [];
+  for (const entry of readdirSync(skillsRoot)) {
+    const dir = join(skillsRoot, entry);
+    if (!statSync(dir).isDirectory()) continue;
+    const skillMd = join(dir, 'SKILL.md');
+    if (existsSync(skillMd)) out.push(resolve(skillMd));
+  }
+  return out.sort();
 }
 
-function ok(msg) {
-  console.log(`  ✅ ${msg}`);
+function validateLiteral(resourceName) {
+  return `node skills/${resourceName}/scripts/validate.mjs`;
 }
 
-/** Retorna o corpo do arquivo após o frontmatter (--- ... ---), ou o todo se não houver. */
-function stripFrontmatter(content) {
-  const m = content.match(/^---\n[\s\S]*?\n---\n?/);
-  return m ? content.slice(m[0].length) : content;
+function mandatoryMatches(content) {
+  return [...content.matchAll(R1_HEADER)];
 }
 
-const skillDirs = readdirSync(SKILLS_DIR).filter((f) =>
-  statSync(join(SKILLS_DIR, f)).isDirectory()
-);
+function getAntesDeResponderBody(content) {
+  const m = content.match(ANTES_HEADER);
+  if (!m || m.index === undefined) return null;
+  const afterHeader = content.slice(m.index + m[0].length);
+  const next = afterHeader.search(NEXT_SECTION);
+  const body = next === -1 ? afterHeader : afterHeader.slice(0, next);
+  return body;
+}
 
-console.log(`\n── lint:skills — ${skillDirs.length} skills\n`);
+/**
+ * @param {string} resourceName nome da pasta da skill (ex.: produtos)
+ * @param {string} content markdown completo do SKILL.md
+ * @returns {{rule: string, message: string}[]}
+ */
+export function lintSkill(resourceName, content) {
+  if (SKIP_SKILLS.includes(resourceName)) return [];
 
-for (const skill of skillDirs.sort()) {
-  const skillPath = join(SKILLS_DIR, skill, 'SKILL.md');
-  if (!existsSync(skillPath)) {
-    fail(skill, 'SKILL.md ausente');
-    continue;
+  const errors = [];
+
+  const matches = mandatoryMatches(content);
+  if (matches.length === 0) {
+    errors.push({
+      rule: 'R1',
+      message:
+        'Deve existir exatamente uma linha "## MANDATORY: Tool Call(s) Required Before Answering"; nenhuma encontrada.',
+    });
+  } else if (matches.length > 1) {
+    errors.push({
+      rule: 'R1',
+      message: `Deve existir exatamente uma linha de header MANDATORY; encontradas ${matches.length}.`,
+    });
   }
-  checked++;
-  const content = readFileSync(skillPath, 'utf-8');
-  const body = stripFrontmatter(content);
-  const trimmed = body.replace(/^\s*\n/, '');
 
-  // Regra 1: bloco MANDATORY imediatamente após o frontmatter.
-  if (!trimmed.startsWith(MANDATORY_HEADING)) {
-    fail(skill, `bloco "${MANDATORY_HEADING}" deve vir imediatamente após o frontmatter`);
-    continue;
-  }
-
-  // Isola o bloco MANDATORY (até o próximo heading "## ").
-  const afterHeading = trimmed.slice(MANDATORY_HEADING.length);
-  const nextHeadingIdx = afterHeading.indexOf('\n## ');
-  const mandatoryBlock =
-    nextHeadingIdx === -1 ? afterHeading : afterHeading.slice(0, nextHeadingIdx);
-
-  // Regra 2: chamada a search_docs.mjs sempre presente.
-  if (!mandatoryBlock.includes(SEARCH_DOCS_CALL)) {
-    fail(skill, `bloco MANDATORY deve chamar \`${SEARCH_DOCS_CALL}\``);
-  }
-
-  // Regra 3: categoria A → validate.mjs no bloco + arquivos no disco.
-  if (CATEGORY_A.includes(skill)) {
-    const validateCall = `skills/${skill}/scripts/validate.mjs`;
-    if (!mandatoryBlock.includes(validateCall)) {
-      fail(skill, `categoria A: bloco MANDATORY deve chamar \`${validateCall}\``);
-    }
-
-    const validatePath = join(SKILLS_DIR, skill, 'scripts', 'validate.mjs');
-    if (!existsSync(validatePath)) {
-      fail(skill, 'categoria A: scripts/validate.mjs ausente');
-    }
-
-    const schemaPath = join(SKILLS_DIR, skill, 'assets', 'schema.json');
-    if (!existsSync(schemaPath)) {
-      fail(skill, 'categoria A: assets/schema.json ausente');
-    } else {
-      try {
-        JSON.parse(readFileSync(schemaPath, 'utf-8'));
-      } catch (e) {
-        fail(skill, `categoria A: assets/schema.json inválido — ${e.message}`);
+  if (matches.length === 1) {
+    const antes = content.match(ANTES_HEADER);
+    if (antes) {
+      const mandatoryIdx = matches[0].index ?? 0;
+      const antesIdx = antes.index ?? 0;
+      if (mandatoryIdx >= antesIdx) {
+        errors.push({
+          rule: 'R2',
+          message:
+            'O header "## MANDATORY: Tool Call(s) Required Before Answering" deve aparecer antes da seção "## Antes de responder".',
+        });
       }
     }
   }
+
+  if (!content.includes(SEARCH_LITERAL)) {
+    errors.push({
+      rule: 'R3',
+      message: `O literal "${SEARCH_LITERAL}" é obrigatório no conteúdo.`,
+    });
+  }
+
+  if (VALIDATE_SKILLS.includes(resourceName)) {
+    const need = validateLiteral(resourceName);
+    if (!content.includes(need)) {
+      errors.push({
+        rule: 'R4',
+        message: `Skills com validate devem incluir o literal "${need}".`,
+      });
+    }
+    const antesBody = getAntesDeResponderBody(content);
+    if (antesBody !== null && antesBody.includes('validate.mjs')) {
+      errors.push({
+        rule: 'R5',
+        message:
+          'A seção "## Antes de responder" não deve mencionar validate.mjs (remover step legado).',
+      });
+    }
+  }
+
+  if (!content.includes(OBRIGATORIA_LITERAL)) {
+    errors.push({
+      rule: 'R6',
+      message:
+        'O conteúdo deve conter a substring "OBRIGATÓRIA" (maiúsculas, com acento).',
+    });
+  }
+
+  if (DENSE_SKILLS.includes(resourceName)) {
+    const lineCount = content.split('\n').length;
+    if (lineCount < MIN_DENSE_LINES) {
+      errors.push({
+        rule: 'R7',
+        message: `Skill aprofundada (issue #100): SKILL.md deve ter ≥ ${MIN_DENSE_LINES} linhas; encontrado ${lineCount}.`,
+      });
+    }
+  }
+
+  return errors;
 }
 
-console.log('');
-if (violations === 0) {
-  ok(`${checked} skills conformes — 0 violações`);
-  console.log('\n🟢 lint:skills passou.\n');
-  process.exit(0);
+/* ─── CLI ─────────────────────────────────────────────────────────── */
+
+function isDirectExecution() {
+  const entry = process.argv[1];
+  if (!entry) return false;
+  try {
+    return import.meta.url === pathToFileURL(entry).href;
+  } catch {
+    return false;
+  }
 }
 
-console.error(`\n🔴 lint:skills falhou — ${violations} violação(ões).\n`);
-process.exit(1);
+function printHelp() {
+  console.log(`Uso:
+  node scripts/lint-skills.mjs [opções] [caminho/SKILL.md]
+
+Sem argumentos: lint em todas as skills/*/SKILL.md (exceto SKIP_SKILLS na saída).
+
+Opções:
+  --json    Emite JSON: array de { file, rule, message }
+  --help    Esta ajuda
+
+Exit: 0 ok · 1 erro(s) de lint · 2 erro de uso (arquivo inexistente, flags inválidas).`);
+}
+
+function parseCli(argv) {
+  let json = false;
+  const positionals = [];
+  for (const a of argv) {
+    if (a === '--help' || a === '-h') return { help: true };
+    if (a === '--json') {
+      json = true;
+      continue;
+    }
+    if (a.startsWith('-')) {
+      return { usageError: `flag desconhecida: ${a}` };
+    }
+    positionals.push(a);
+  }
+  if (positionals.length > 1) {
+    return { usageError: 'no máximo um caminho de arquivo é aceito' };
+  }
+  return { json, file: positionals[0] ?? null };
+}
+
+function resourceFromSkillPath(absPath) {
+  return basename(dirname(absPath));
+}
+
+function main() {
+  const parsed = parseCli(process.argv.slice(2));
+  if ('usageError' in parsed && parsed.usageError) {
+    console.error(parsed.usageError);
+    process.exit(2);
+  }
+  if (parsed.help) {
+    printHelp();
+    process.exit(0);
+  }
+
+  const __dir = dirname(fileURLToPath(import.meta.url));
+  const ROOT = join(__dir, '..');
+  const skillsDir = join(ROOT, 'skills');
+
+  /** @type {{file: string, errors: ReturnType<typeof lintSkill>}[]} */
+  const results = [];
+
+  if (parsed.file) {
+    const abs = resolve(parsed.file);
+    if (!existsSync(abs)) {
+      console.error(`arquivo não encontrado: ${abs}`);
+      process.exit(2);
+    }
+    const resourceName = resourceFromSkillPath(abs);
+    if (SKIP_SKILLS.includes(resourceName)) {
+      if (parsed.json) {
+        console.log(JSON.stringify([]));
+      } else {
+        console.log(`⏭️  ${abs} (pulado: SKIP_SKILLS)`);
+      }
+      process.exit(0);
+    }
+    const content = readFileSync(abs, 'utf-8');
+    results.push({ file: abs, errors: lintSkill(resourceName, content) });
+  } else {
+    const files = findSkillFiles(skillsDir);
+    for (const abs of files) {
+      const resourceName = resourceFromSkillPath(abs);
+      if (SKIP_SKILLS.includes(resourceName)) {
+        if (!parsed.json) {
+          console.log(`⏭️  ${abs} (pulado: SKIP_SKILLS)`);
+        }
+        continue;
+      }
+      const content = readFileSync(abs, 'utf-8');
+      results.push({ file: abs, errors: lintSkill(resourceName, content) });
+    }
+  }
+
+  if (parsed.json) {
+    const flat = [];
+    for (const { file, errors } of results) {
+      for (const e of errors) {
+        flat.push({ file, rule: e.rule, message: e.message });
+      }
+    }
+    console.log(JSON.stringify(flat));
+    process.exit(flat.length ? 1 : 0);
+  }
+
+  let failCount = 0;
+  for (const { file, errors } of results) {
+    if (errors.length === 0) {
+      console.log(`✅ ${file}`);
+    } else {
+      console.error(`❌ ${file}:`);
+      for (const e of errors) {
+        console.error(`   ${e.rule}: ${e.message}`);
+      }
+      failCount += errors.length;
+    }
+  }
+
+  process.exit(failCount ? 1 : 0);
+}
+
+if (isDirectExecution()) main();

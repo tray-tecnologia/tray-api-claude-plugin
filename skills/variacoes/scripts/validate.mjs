@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 /**
- * Valida um payload da API de Variações da Tray contra o schema local.
- * Uso: node skills/variacoes/scripts/validate.mjs '<payload_json>'
- * Também aceita payload via stdin redirecionado.
+ * CLI fino — delega para scripts/lib/validate-schema.mjs (runValidator v2).
+ * Schemas: variacao.create, variacao.update.
  */
 import { runValidator } from '../../../scripts/lib/validate-schema.mjs';
 
 await runValidator({
   callerUrl: import.meta.url,
   skillName: 'variacoes',
-  usageExample: '{"Variant":{"product_id":"<id>","type_1":"Cor","value_1":"Azul"}}',
+  usageExample: '--schema=variacao.create \'{"Variant":{"sku":"CAM-AZ-M","price":49.9}}\'',
 });

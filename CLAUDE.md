@@ -10,7 +10,7 @@ Documentação oficial: https://developers.tray.com.br
 ## Regras obrigatórias
 
 - `access_token` é passado como query parameter em todas as chamadas: `?access_token={token}`.
-- URL base: `https://{api_address}/` — retornada no callback OAuth, varia por loja.
+- URL base: `https://{api_address}/` — retornada no callback OAuth, varia por loja. **`api_address` já inclui o sufixo `/web_api`** (ex.: `urldaloja.com.br/web_api`), então a URL final fica `https://urldaloja.com.br/web_api/<recurso>`. Armazene o `api_address` exatamente como veio do callback; omitir o `/web_api` causa `HTTP 404`.
 - `access_token` expira em 3 horas; `refresh_token` expira em 30 dias.
 - Payload JSON envolto na chave do recurso: `{"Product": {...}}`, `{"Order": {...}}`.
 - Rate limit: 180 req/min e 10.000 req/dia. Tratar HTTP 429 com retry.

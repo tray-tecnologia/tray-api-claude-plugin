@@ -1,0 +1,13 @@
+{
+  "Payment": {
+    "order_id": 1001,
+    "payment_method": "PagSeguro",
+    "payment_type": "credit_card",
+    "amount": "299.90",
+    "installments": 3,
+    "status": "approved",
+    "transaction_id": "PAG-123456",
+    "card_brand": "Visa",
+    "card_last_digits": "4321"
+  }
+}

@@ -13,10 +13,31 @@ when_not_to_use: >
   produto como cor ou material (use tray-caracteristicas).
 ---
 
-## MANDATORY: Tool Call(s) Required Before Answering
+## MANDATORY: Tool Calls Required Before Answering
 
-- **OBRIGATÓRIO:** `node skills/tray-dev/scripts/search_docs.mjs "<termo>"` — confirme o comportamento da API antes de gerar código.
-- **OBRIGATÓRIO:** `node skills/marcas/scripts/validate.mjs '<payload_json>'` — valide a estrutura do payload de marca antes de retornar código ao usuário.
+> **Estas chamadas são OBRIGATÓRIAS, não opcionais.** Execute-as antes de gerar
+> qualquer código ou payload. Se você está respondendo sem ter chamado as duas
+> ferramentas abaixo, **pare e chame agora**.
+
+### 1. Buscar documentação atualizada (sempre)
+
+```bash
+node skills/tray-dev/scripts/search_docs.mjs --topic=marcas "<termo da pergunta>"
+```
+
+- `<TOPIC_SLUG>`: ver tabela em `skills/tray-dev/SKILL.md`.
+- Use os trechos retornados como fonte primária; este SKILL.md é resumo.
+
+### 2. Validar payload localmente (antes de retornar código)
+
+```bash
+node skills/marcas/scripts/validate.mjs --schema=<SCHEMA_NAME> '<payload_json>'
+```
+
+- Schemas disponíveis: `marca.create`, `marca.update`. Use `--list-schemas` para confirmar.
+- Exit codes: `0` válido · `1` inválido · `2` erro de uso.
+- Para output programático: `--json`.
+- Corrija todos os erros antes de retornar o código (até 3 tentativas).
 
 ## Antes de responder
 
@@ -26,15 +47,6 @@ when_not_to_use: >
 2. Identifique os campos obrigatórios listados neste documento — não omita nenhum.
 3. Verifique que `access_token` não aparece como literal string no código gerado.
 4. Confirme que esta é a skill correta para o recurso (leia `when_not_to_use` no frontmatter).
-5. Execute `node skills/marcas/scripts/validate.mjs '<payload_json>'`
-   para confirmar a estrutura do payload que vai gerar. O validador checa
-   apenas **estrutura** (campos obrigatórios, tipos e campos desconhecidos),
-   nunca valores reais — então monte um payload sintético com placeholders
-   sempre que os valores vierem de variáveis de ambiente, da entrada do
-   usuário ou de outras chamadas. Exemplo:
-   `node skills/marcas/scripts/validate.mjs '{"Brand":{"brand":"<nome>"}}'`.
-   Corrija todos os erros antes de retornar o código ao usuário. Até 3
-   tentativas — se persistir, explique o problema ao usuário.
 
 # API de Marcas — Tray
 
@@ -66,6 +78,12 @@ Documentação oficial: https://developers.tray.com.br/#api-de-marca-do-produto
 > em `"Invalid data provided"` (HTTP 400) — a API ignora o campo desconhecido e
 > falha por `brand` ausente. Os campos aceitos no payload são apenas `brand` e
 > `slug`. Os campos `description` e `image` **não** existem nesta API de marcas.
+
+> **Atenção (causa #1 de HTTP 400 neste recurso):** o campo do nome da marca é
+> `brand`, **não** `name`. Enviar `{"Brand": {"name": "Nike"}}` resulta em
+> `HTTP 400`. Confirmado contra a doc oficial: o body e a resposta usam `brand`
+> (ex.: `{"Brand": {"slug": "nike", "brand": "Nike"}}`), e o filtro de listagem
+> também é `brand` (não `name`).
 
 ## Paginação
 

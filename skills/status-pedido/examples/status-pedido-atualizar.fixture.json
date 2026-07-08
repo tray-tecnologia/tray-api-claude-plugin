@@ -1,0 +1,9 @@
+{
+  "OrderStatus": {
+    "name": "Em Separação",
+    "description": "Pedido sendo preparado para envio",
+    "background_color": "#3498DB",
+    "font_color": "#FFFFFF",
+    "type": "open"
+  }
+}

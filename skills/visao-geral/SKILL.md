@@ -18,10 +18,6 @@ when_not_to_use: >
   etc.) carregue esta skill em conjunto com a skill do recurso, não isolada.
 ---
 
-## MANDATORY: Tool Call(s) Required Before Answering
-
-- **OBRIGATÓRIO:** `node skills/tray-dev/scripts/search_docs.mjs "<termo>"` — confirme o comportamento da API antes de gerar código.
-
 ## Antes de responder
 
 > Execute estas verificações antes de gerar qualquer payload ou código:
@@ -67,6 +63,15 @@ https://{api_address}/<recurso>?access_token={token}
 
 `api_address` **varia por loja** e é retornado no callback OAuth da
 Etapa 2. Armazene junto com os tokens.
+
+> **Atenção — `api_address` já contém `/web_api`.** O valor retornado no
+> callback é o domínio da loja **+ `/web_api`** (ex.: `urldaloja.com.br/web_api`),
+> conforme a doc oficial (`api_address = {URL da loja}/web_api`). Logo a URL
+> final de qualquer recurso é `https://urldaloja.com.br/web_api/<recurso>` — o
+> `{api_address}` dos exemplos das skills **já embute** o `/web_api`, por isso os
+> exemplos não o repetem. Armazene o `api_address` exatamente como veio do
+> callback (com o `/web_api`); guardar só `urldaloja.com.br` e montar
+> `https://urldaloja.com.br/<recurso>` resulta em `HTTP 404`.
 
 ### 3. Formato de payload
 

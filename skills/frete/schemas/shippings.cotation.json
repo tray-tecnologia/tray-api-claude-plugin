@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Shipping",
+  "description": "Parâmetros de query da cotação de frete via GET /shippings/cotation/ (recurso somente leitura). NÃO há body — os parâmetros vão na query string junto de ?access_token={token} (sempre query param, nunca header). Wrapper de resposta: Shipping (array de métodos com preço e prazo). Este schema documenta a forma lógica dos parâmetros: zipcode (CEP de destino) e a lista products. Doc: https://developers.tray.com.br/#api-de-integracao-de-frete. NÃO-VERIFICADO contra sandbox — validar antes do merge.",
+  "type": "object",
+  "properties": {
+    "zipcode": {
+      "type": "string",
+      "format": "cep",
+      "description": "CEP de destino, apenas números (8 dígitos, sem traço ou ponto, ex.: 04001001). CEP com máscara pode resultar em cotação vazia ou HTTP 400."
+    },
+    "products": {
+      "type": "array",
+      "description": "Lista de produtos a cotar. Cada item vira products[n][campo] na query string, com índice n iniciando em 0. Para múltiplos itens, incremente o índice (products[0], products[1]...); repetir products[0] coteja apenas um produto e subdimensiona o frete."
+    }
+  },
+  "required": [
+    "zipcode",
+    "products"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Product",
+  "description": "Payload de criação de produto via POST /products. Doc: https://developers.tray.com.br/#api-de-produtos",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "Nome do produto."
+    },
+    "price": {
+      "type": ["number", "string"],
+      "minimum": 0,
+      "pattern": "^[0-9]+(\\.[0-9]{1,2})?$",
+      "description": "Preço de venda em reais (ponto decimal, não vírgula). Aceita number (49.90) ou string decimal (\"49.90\") — a API Tray retorna e aceita o preço como string."
+    },
+    "description": {
+      "type": "string",
+      "description": "Descrição longa em HTML ou texto."
+    },
+    "stock": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Quantidade em estoque."
+    },
+    "ean": {
+      "type": "string",
+      "format": "ean",
+      "description": "Código de barras GTIN-8/12/13/14 com DV correto."
+    },
+    "ncm": {
+      "type": "string",
+      "format": "ncm",
+      "description": "Classificação fiscal NCM com 8 dígitos."
+    },
+    "category_id": {
+      "type": "integer",
+      "description": "ID da categoria principal do produto."
+    },
+    "brand_id": {
+      "type": "integer",
+      "description": "ID da marca."
+    },
+    "weight": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Peso em kg."
+    },
+    "length": { "type": "number", "minimum": 0 },
+    "width": { "type": "number", "minimum": 0 },
+    "height": { "type": "number", "minimum": 0 },
+    "available": {
+      "type": "integer",
+      "enum": [0, 1],
+      "description": "1 = disponível para venda; 0 = indisponível."
+    }
+  },
+  "required": ["name", "price"],
+  "additionalProperties": false
+}

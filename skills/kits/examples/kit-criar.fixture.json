@@ -1,0 +1,8 @@
+{
+  "Kit": {
+    "product_id": 456,
+    "kit_product_id": 100,
+    "quantity": 2,
+    "product_parent_id": 100
+  }
+}

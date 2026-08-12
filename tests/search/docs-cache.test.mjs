@@ -3,7 +3,7 @@ import { strict as assert } from 'node:assert';
 import { mkdtempSync, rmSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { writeCache, readCache, isFresh, clearCache, hashContent } from '../../scripts/lib/docs-cache.mjs';
+import { writeCache, readCache, isFresh, clearCache, hashContent, INDEX_VERSION } from '../../scripts/lib/docs-cache.mjs';
 
 let tmp;
 beforeEach(() => { tmp = mkdtempSync(join(tmpdir(), 'tray-cache-')); });
@@ -34,7 +34,13 @@ test('cache: readCache retorna estado quando existe', async () => {
 
 test('cache: isFresh true quando idade < TTL', () => {
   const now = Date.now();
-  assert.equal(isFresh({ fetchedAt: new Date(now - 1000).toISOString(), ttlMs: 86400000 }), true);
+  assert.equal(isFresh({ fetchedAt: new Date(now - 1000).toISOString(), ttlMs: 86400000, indexVersion: INDEX_VERSION }), true);
+});
+
+test('cache: isFresh false quando indexVersion é de outra versão do pipeline', () => {
+  const now = Date.now();
+  assert.equal(isFresh({ fetchedAt: new Date(now - 1000).toISOString(), ttlMs: 86400000, indexVersion: '1.0.0' }), false);
+  assert.equal(isFresh({ fetchedAt: new Date(now - 1000).toISOString(), ttlMs: 86400000 }), false);
 });
 
 test('cache: isFresh false quando idade > TTL', () => {

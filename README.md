@@ -362,7 +362,7 @@ node skills/tray-dev/scripts/search_docs.mjs --list-topics
 
 ### Cache
 
-O primeiro uso baixa a SPA pública (~625 KB) e indexa em `~/.cache/tray-plugin/dev-docs/`. Execuções subsequentes (24h) usam cache. Override via env vars:
+O primeiro uso baixa a página pública (~1,6 MB de HTML), converte para Markdown e indexa em `~/.cache/tray-plugin/dev-docs/`. Execuções subsequentes (24h) usam cache. Override via env vars:
 
 - `TRAY_DOCS_CACHE_DIR` — diretório do cache
 - `TRAY_DOCS_CACHE_TTL_MS` — TTL em milissegundos (default 86400000 = 24h)

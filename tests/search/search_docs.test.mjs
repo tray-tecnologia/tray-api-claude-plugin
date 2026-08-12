@@ -5,6 +5,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { INDEX_VERSION } from '../../scripts/lib/docs-cache.mjs';
 
 const SCRIPT = fileURLToPath(new URL('../../skills/tray-dev/scripts/search_docs.mjs', import.meta.url));
 
@@ -19,7 +20,7 @@ function makeFixtureCache(tmp) {
   writeFileSync(join(tmp, 'raw.html'), `# API de Produtos\n\n## POST /products\n\nCria produto novo com nome.\n`, 'utf8');
   writeFileSync(join(tmp, 'parsed.md'), '', 'utf8');
   const index = {
-    version: '1.0.0',
+    version: INDEX_VERSION,
     documents: [
       {
         id: 'post-products',
@@ -42,7 +43,7 @@ function makeFixtureCache(tmp) {
     fetchedAt: new Date().toISOString(),
     ttlMs: 86400000,
     sourceHash: 'sha256:abc',
-    indexVersion: '1.0.0'
+    indexVersion: INDEX_VERSION
   }), 'utf8');
 }
 

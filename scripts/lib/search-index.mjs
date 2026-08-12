@@ -1,6 +1,7 @@
 import { stem } from './stemmer-pt-br.mjs';
 import { splitMarkdown } from './markdown-splitter.mjs';
-import { writeCache, readCache, isFresh, hashContent } from './docs-cache.mjs';
+import { htmlToMarkdown, looksLikeHtml } from './html-to-markdown.mjs';
+import { writeCache, readCache, isFresh, hashContent, INDEX_VERSION } from './docs-cache.mjs';
 
 const STOPWORDS = new Set([
   'a','o','de','do','da','dos','das','e','é','em','na','no','nas','nos',
@@ -72,7 +73,7 @@ export function buildIndex(documents) {
     }
   }
   return {
-    version: '1.0.0',
+    version: INDEX_VERSION,
     documents: docs,
     docFreq,
     termFreq: null,
@@ -207,16 +208,25 @@ export async function loadOrFetch({ cacheDir, ttlMs, baseUrl, forceRefresh = fal
     throw err;
   }
   const sourceHash = hashContent(raw);
-  if (existing && existing.metadata.sourceHash === sourceHash) {
+  // Só reaproveita o índice se ele veio da versão atual do pipeline: senão
+  // um índice gerado por parser antigo ficaria preso enquanto a doc não
+  // mudasse — inclusive um índice vazio.
+  const reusable =
+    existing &&
+    existing.metadata.sourceHash === sourceHash &&
+    existing.metadata.indexVersion === INDEX_VERSION;
+  if (reusable) {
     await writeCache(cacheDir, { raw, parsed: existing.parsed, index: existing.index }, ttlMs);
     return {
       index: existing.index,
       cache: { hit: false, refreshed: true, sameContent: true }
     };
   }
-  const docs = splitMarkdown(raw);
+  // A doc chega como HTML renderizado; o índice é construído sobre Markdown.
+  const parsed = looksLikeHtml(raw) ? htmlToMarkdown(raw) : raw;
+  const docs = splitMarkdown(parsed);
   const index = buildIndex(docs);
-  await writeCache(cacheDir, { raw, parsed: raw, index }, ttlMs);
+  await writeCache(cacheDir, { raw, parsed, index }, ttlMs);
   return {
     index,
     cache: existing

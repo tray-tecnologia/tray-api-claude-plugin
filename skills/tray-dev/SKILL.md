@@ -23,7 +23,7 @@ when_not_to_use: Não use em lugar das skills de recurso (`tray-produtos`, `tray
 
 `tray-dev` indexa localmente `https://developers.tray.com.br` (fetch + cache 24h) e oferece busca lexical (BM25) sobre todos os endpoints, campos, exemplos e códigos de erro da API Tray, em < 100 ms p95 com cache quente. Substitui a documentação estática que envelhece entre releases.
 
-A primeira execução faz fetch da SPA pública (~625 KB), parseia em ~700 seções (H1/H2/H3) e indexa em `~/.cache/tray-plugin/dev-docs/`. Execuções subsequentes (24h) usam cache.
+A primeira execução faz fetch da página pública (~1,6 MB de HTML), converte para Markdown (~660 KB), parseia em ~820 seções (H1/H2/H3) e indexa em `~/.cache/tray-plugin/dev-docs/`. Execuções subsequentes (24h) usam cache.
 
 ## CLI
 
@@ -137,7 +137,7 @@ export OPT_OUT_INSTRUMENTATION=true
 
 - Sinônimos PT-BR cobrem ~23 grupos no MVP. Expansão via PR em `assets/synonyms-pt-br.json`.
 - Stemmer simples (sufixos comuns). Não é Snowball/RSLP completo.
-- Sem busca semântica/embeddings (out of scope; lexical é suficiente para 625 KB de doc).
+- Sem busca semântica/embeddings (out of scope; lexical é suficiente para o volume da doc).
 - O `body` retornado nos resultados é truncado em 200 caracteres.
 
 ## Erros comuns

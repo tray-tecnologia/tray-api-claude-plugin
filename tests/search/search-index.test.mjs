@@ -7,6 +7,7 @@ import {
   expandSynonyms
 } from '../../scripts/lib/search-index.mjs';
 import { TOPICS_MAP } from '../../scripts/lib/topics-map.mjs';
+import { INDEX_VERSION } from '../../scripts/lib/docs-cache.mjs';
 
 const SAMPLE_DOCS = [
   { h1: 'Autorização', title: 'Gerar Chaves', level: 'h2', body: 'Use OAuth 2.0 para autenticar', code: [{ lang: 'shell', content: 'curl -X POST /auth' }], anchor: 'gerar-chaves' },
@@ -66,7 +67,7 @@ test('buildIndex: produz estrutura esperada', () => {
   assert.equal(idx.documents.length, 4);
   assert.ok(idx.avgdl > 0);
   assert.ok(idx.docFreq);
-  assert.equal(idx.version, '1.0.0');
+  assert.equal(idx.version, INDEX_VERSION);
 });
 
 test('search: query "OAuth" prioriza doc de Autorização', () => {

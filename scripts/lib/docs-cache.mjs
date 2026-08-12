@@ -3,6 +3,13 @@ import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 
+/**
+ * Versão do formato do índice. Subir aqui invalida todo cache local já
+ * gravado — é o que faz uma correção no parser chegar em quem já usa o
+ * plugin, sem pedir limpeza manual de `~/.cache/tray-plugin/dev-docs/`.
+ */
+export const INDEX_VERSION = '2.0.0';
+
 export function hashContent(text) {
   return 'sha256:' + createHash('sha256').update(text).digest('hex');
 }
@@ -16,7 +23,7 @@ export async function writeCache(dir, { raw, parsed, index }, ttlMs) {
     fetchedAt: new Date().toISOString(),
     ttlMs,
     sourceHash: hashContent(raw),
-    indexVersion: '1.0.0'
+    indexVersion: INDEX_VERSION
   };
   await writeFile(join(dir, 'metadata.json'), JSON.stringify(metadata, null, 2), 'utf8');
 }
@@ -36,6 +43,7 @@ export async function readCache(dir) {
 
 export function isFresh(metadata) {
   if (!metadata?.fetchedAt || typeof metadata.ttlMs !== 'number') return false;
+  if (metadata.indexVersion !== INDEX_VERSION) return false;
   const age = Date.now() - new Date(metadata.fetchedAt).getTime();
   return age < metadata.ttlMs;
 }

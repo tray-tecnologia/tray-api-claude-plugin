@@ -17,7 +17,7 @@ export const TOPICS_MAP = {
   'caracteristicas': 'APIs de Características',
   'informacoes-loja': 'APIs de Informações da Loja',
   'carrinho-compras': 'APIs de Carrinho de Compra',
-  'listagem-carrinho': 'Novo API de Listagem de Carrinho',
+  'listagem-carrinho': 'API de Listagem de Carrinho',
   'listas-preco-b2b': 'API de Lista de Preço B2B',
   'usuarios': 'APIs de Usuário',
   'parceiros': 'APIs de Parceiros',

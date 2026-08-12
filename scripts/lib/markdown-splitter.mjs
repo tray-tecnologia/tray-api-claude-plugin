@@ -10,7 +10,13 @@ function slugify(text) {
 function parseHeading(line) {
   const m = line.match(/^(#{1,3})\s+(.+?)\s*$/);
   if (!m) return null;
-  return { level: `h${m[1].length}`, title: m[2] };
+  // Âncora explícita (`## Título {#ancora}`) vinda do HTML da doc; sem ela,
+  // cai no slug do título.
+  const withAnchor = m[2].match(/^(.*?)\s*\{#([^}\s]+)\}$/);
+  if (withAnchor) {
+    return { level: `h${m[1].length}`, title: withAnchor[1].trim(), anchor: withAnchor[2] };
+  }
+  return { level: `h${m[1].length}`, title: m[2], anchor: null };
 }
 
 function flushSection(current) {
@@ -30,7 +36,7 @@ function flushSection(current) {
     h3: current.h3,
     title: current.title,
     level: current.level,
-    anchor: slugify(current.title),
+    anchor: current.anchor || slugify(current.title),
     body,
     code,
   };
@@ -65,6 +71,7 @@ export function splitMarkdown(md) {
         h3,
         title: h.title,
         level: h.level,
+        anchor: h.anchor,
         bodyLines: [],
       };
     } else if (current) {
